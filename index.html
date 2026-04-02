@@ -1,3 +1,14 @@
+<script>
+  const pw = localStorage.getItem('ibs_auth');
+  if (pw !== 'IBS2026') {
+    const input = prompt('비밀번호를 입력하세요:');
+    if (input === 'IBS2026') {
+      localStorage.setItem('ibs_auth', '2026');
+    } else {
+      document.body.innerHTML = '접근 권한이 없습니다.';
+    }
+  }
+</script>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
