@@ -323,6 +323,10 @@ body.dark .today-card-title{color:#93c5fd}
 .date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.section-divider{font-size:12px;font-weight:700;color:var(--text);margin:12px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .longterm-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;padding:9px 12px;background:var(--green-light);border:1.5px solid var(--green);border-radius:var(--r-sm)}
 .longterm-row label{font-size:13px;color:var(--green);font-weight:600;cursor:pointer;flex:1}.longterm-row label.toggle{flex:0 0 52px}
+/* 장기투숙 원터치 버튼 */
+.btn-longterm-quick{background:var(--green-light);color:var(--green);border:2px solid var(--green);border-radius:var(--r-sm);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-longterm-quick:hover{background:var(--green);color:#fff}
+.btn-longterm-quick.lt-active{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,.3)}
 .toggle{position:relative;display:inline-block;width:52px;min-width:52px;max-width:52px;height:28px;overflow:hidden;flex-shrink:0}.toggle input{opacity:0;position:absolute;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
 .toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:14px;cursor:pointer;transition:.3s}
 .toggle-slider:before{content:'';position:absolute;height:22px;width:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -417,6 +421,19 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
   .cal-cell{min-height:44px}.cal-day-num{font-size:10px}
   .cal-stay-wrap{display:none}
   .cal-event{font-size:9px;padding:1px 3px}
+  /* ★ 통계 차트 모바일 최적화 */
+  .stat-bar-label{min-width:60px;font-size:11px}
+  .stat-bar-track{height:18px}
+  .stat-bar-fill{font-size:9px;padding:0 5px;min-width:28px}
+  .stat-bar-val{font-size:10px;min-width:20px}
+  .stat-monthly-wrap{height:90px}
+  /* ★ 모달 모바일 최적화 */
+  .modal-body{padding:14px 12px!important}
+  .date-row{flex-direction:column!important;gap:8px!important}
+  .btn-longterm-quick{width:100%;justify-content:center;padding:10px}
+  /* ★ 체크인/아웃 리스트 컴팩트 */
+  .occ-card{margin-bottom:8px}
+  .occ-card-header{margin-bottom:8px}
 }
 /* ══════════════════════════════════════════
    🍱 식사 탭 — Redesigned
@@ -1047,10 +1064,14 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
       </div>
       <div id="newBookingForm" style="display:none">
       <div class="overlap-warn" id="overlapWarn">⚠ 이 기간에 겹치는 예약이 있어요!</div>
-      <div class="longterm-row"><label for="ltToggle">🏡 장기투숙 (체크아웃 날짜 없음)</label><label class="toggle" style="flex:0 0 52px!important;width:52px!important;max-width:52px!important;overflow:hidden"><input type="checkbox" id="ltToggle" onchange="toggleLongterm()"><span class="toggle-slider"></span></label></div>
       <div class="date-row form-row">
-        <div><label class="form-label" for="inCheckIn">체크인 * <button type="button" class="btn btn-ghost" style="font-size:11px;padding:2px 8px;min-height:24px;margin-left:4px" onclick="openDRP()">📅 캘린더 선택</button></label><input class="form-input" type="text" id="inCheckIn" readonly onclick="openDRP('inCheckIn','inCheckOut')" style="cursor:pointer" placeholder="날짜 선택"><div class="form-hint" id="hintCI">체크인 날짜를 입력하세요</div></div>
-        <div id="coWrap"><label class="form-label" for="inCheckOut">체크아웃</label><input class="form-input" type="text" id="inCheckOut" readonly onclick="openDRP('inCheckIn','inCheckOut')" style="cursor:pointer" placeholder="날짜 선택"><div class="form-hint" id="hintCO">체크아웃이 체크인보다 앞설 수 없어요</div></div>
+        <div style="flex:1"><label class="form-label" for="inCheckIn">체크인 * <button type="button" class="btn btn-ghost" style="font-size:11px;padding:2px 8px;min-height:24px;margin-left:4px" onclick="openDRP()">📅 캘린더 선택</button></label><input class="form-input" type="text" id="inCheckIn" readonly onclick="openDRP('inCheckIn','inCheckOut')" style="cursor:pointer" placeholder="날짜 선택"><div class="form-hint" id="hintCI">체크인 날짜를 입력하세요</div></div>
+        <div id="coWrap" style="flex:1"><label class="form-label" for="inCheckOut">체크아웃</label><input class="form-input" type="text" id="inCheckOut" readonly onclick="openDRP('inCheckIn','inCheckOut')" style="cursor:pointer" placeholder="날짜 선택"><div class="form-hint" id="hintCO">체크아웃이 체크인보다 앞설 수 없어요</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <input type="checkbox" id="ltToggle" onchange="toggleLongterm()" style="display:none">
+        <button type="button" class="btn-longterm-quick" id="btnLTQuick" onclick="quickLongterm()">🏡 장기투숙</button>
+        <span id="ltQuickLabel" style="font-size:11px;color:var(--text3)">체크아웃 없이 저장</span>
       </div>
       <div class="form-row"><label class="form-label" for="inName">이름 *</label><div class="ac-wrap"><input class="form-input" type="text" id="inName" placeholder="투숙자 이름" autocomplete="off" oninput="acInput('inName','acName',getNameSuggestions)" onchange="if(typeof smartDefaults==='function')smartDefaults(this.value)"><div class="ac-list" id="acName"></div></div></div>
       <div class="form-row"><label class="form-label" for="inRoom">룸 변경</label><select class="form-select" id="inRoom"></select></div>
@@ -2281,7 +2302,8 @@ function calDayClick(ds){
 
 /* ── 모달 ── */
 let modalCtx=null;
-function toggleLongterm(){const on=document.getElementById('ltToggle').checked;document.getElementById('coWrap').style.opacity=on?'.4':'1';document.getElementById('inCheckOut').disabled=on;if(on)document.getElementById('inCheckOut').value='';validateDates();}
+function toggleLongterm(){const on=document.getElementById('ltToggle').checked;document.getElementById('coWrap').style.opacity=on?'.4':'1';document.getElementById('inCheckOut').disabled=on;if(on)document.getElementById('inCheckOut').value='';const btn=document.getElementById('btnLTQuick');if(btn){btn.classList.toggle('lt-active',on);document.getElementById('ltQuickLabel').textContent=on?'✓ 장기투숙 설정됨':'체크아웃 없이 저장';}validateDates();}
+function quickLongterm(){const lt=document.getElementById('ltToggle');lt.checked=!lt.checked;toggleLongterm();if(lt.checked)showToast('🏡 장기투숙 모드 — 체크아웃 날짜 없이 저장됩니다');}
 function validateDates(){const ci=document.getElementById('inCheckIn').value;const co=document.getElementById('inCheckOut').value;const lt=document.getElementById('ltToggle').checked;let valid=true;const ciEl=document.getElementById('inCheckIn');const hCI=document.getElementById('hintCI');if(!ci){ciEl.classList.add('error');hCI.classList.add('show');valid=false;}else{ciEl.classList.remove('error');hCI.classList.remove('show');}const coEl=document.getElementById('inCheckOut');const hCO=document.getElementById('hintCO');if(!lt&&co&&ci&&pd(co)<=pd(ci)){coEl.classList.add('error');hCO.classList.add('show');valid=false;}else{coEl.classList.remove('error');hCO.classList.remove('show');}if(modalCtx&&ci){const rv=document.getElementById('inRoom').value;let bId=modalCtx.bldgId,rm=modalCtx.room;if(rv){const p=rv.split('|||');bId=p[0];rm=p[1];}document.getElementById('overlapWarn').classList.toggle('show',hasOverlap(bId,rm,ci,lt?'':co));}return valid;}
 
 // 새 예약용 모달 (룸 미지정)
@@ -2320,7 +2342,7 @@ function toggleNewBookingForm(){
   if(open)setTimeout(()=>document.getElementById('inName').focus(),100);
 }
 
-function openModal(bldgId,room){modalCtx={bldgId,room};const bg=BUILDINGS.find(b=>b.id===bldgId);const isGH=bg&&bg.group==='gh';document.getElementById('modalTitle').textContent=bg?bg.name:bldgId;const tag=document.getElementById('modalRoomTag');tag.textContent=bldgId+' – '+room;tag.className='modal-room-tag '+(isGH?'tag-room-gh':'tag-room-ibs');document.getElementById('ltToggle').checked=false;document.getElementById('coWrap').style.opacity='1';document.getElementById('inCheckOut').disabled=false;document.getElementById('inCheckIn').value=TODAYSTR;document.getElementById('inCheckOut').value='';document.getElementById('inName').value='';document.getElementById('inCompany').value='';document.getElementById('inPaymentSelect').value='';document.getElementById('inPayment').value='';document.getElementById('inRemark').value='';document.getElementById('inPhone').value='';document.getElementById('inEmail').value='';document.getElementById('inGuestCount').value='1';document.getElementById('inRoomRate').value='';document.getElementById('inCheckIn').classList.remove('error');document.getElementById('inCheckOut').classList.remove('error');document.getElementById('hintCI').classList.remove('show');document.getElementById('hintCO').classList.remove('show');document.getElementById('overlapWarn').classList.remove('show');document.getElementById('inRoom').innerHTML=buildRoomSelect(bldgId,room);
+function openModal(bldgId,room){modalCtx={bldgId,room};const bg=BUILDINGS.find(b=>b.id===bldgId);const isGH=bg&&bg.group==='gh';document.getElementById('modalTitle').textContent=bg?bg.name:bldgId;const tag=document.getElementById('modalRoomTag');tag.textContent=bldgId+' – '+room;tag.className='modal-room-tag '+(isGH?'tag-room-gh':'tag-room-ibs');document.getElementById('ltToggle').checked=false;document.getElementById('coWrap').style.opacity='1';document.getElementById('inCheckOut').disabled=false;var _ltB=document.getElementById('btnLTQuick');if(_ltB){_ltB.classList.remove('lt-active');document.getElementById('ltQuickLabel').textContent='체크아웃 없이 저장';}document.getElementById('inCheckIn').value=TODAYSTR;document.getElementById('inCheckOut').value='';document.getElementById('inName').value='';document.getElementById('inCompany').value='';document.getElementById('inPaymentSelect').value='';document.getElementById('inPayment').value='';document.getElementById('inRemark').value='';document.getElementById('inPhone').value='';document.getElementById('inEmail').value='';document.getElementById('inGuestCount').value='1';document.getElementById('inRoomRate').value='';document.getElementById('inCheckIn').classList.remove('error');document.getElementById('inCheckOut').classList.remove('error');document.getElementById('hintCI').classList.remove('show');document.getElementById('hintCO').classList.remove('show');document.getElementById('overlapWarn').classList.remove('show');document.getElementById('inRoom').innerHTML=buildRoomSelect(bldgId,room);
 // 새 예약 폼 초기화 (접힘)
 const nf=document.getElementById('newBookingForm');const na=document.getElementById('newBookingArrow');
 if(nf)nf.style.display='none';if(na)na.style.transform='';
