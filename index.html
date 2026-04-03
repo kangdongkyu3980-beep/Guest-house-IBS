@@ -905,11 +905,9 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 .cap-tbl td{padding:1px 4px;border:1px solid #e0e0e0;font-size:10px;line-height:1.2}
 .cap-grp td{background:#e8f0fe;font-weight:800;color:#1a73e8;border-bottom:1.5px solid #1a73e8!important;font-size:10px;padding:1px 4px}
 .cap-ibs td{background:#e8f5e9;font-weight:800;color:#2e7d32;border-bottom:1.5px solid #2e7d32!important;padding:1px 4px}
-.cap-rm td:nth-child(1){font-weight:600;white-space:nowrap}
+.cap-rm td:nth-child(1){font-weight:600;white-space:nowrap;width:1%;padding-right:8px}
 .cap-rm td:nth-child(2){font-size:10px;color:#444}
-.cap-rm td:nth-child(3){text-align:center;font-weight:700;white-space:nowrap}
-.cap-rm td:nth-child(4){white-space:nowrap}
-.cap-rm td:nth-child(5){font-size:9px;color:#666;word-break:break-word}
+.cap-rm td:nth-child(3){text-align:center;font-weight:700;white-space:nowrap;width:1%}
 .cap-note{font-size:8px;color:#999;margin-top:2px;padding:2px 4px;background:#fafafa;border:1px solid #eee;border-radius:3px}
 .cap-bar{position:sticky;top:0;z-index:10;background:#fff;padding:4px 8px;display:flex;gap:4px;justify-content:center;border-bottom:2px solid #1a73e8;flex-wrap:nowrap}
 .cap-bar button{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
@@ -1139,7 +1137,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
     <button class="cap-zoom" onclick="capZoom(-1)">🔍−</button>
     <button class="cap-zoom" onclick="capZoom(0)">1:1</button>
     <button class="cap-zoom" onclick="capZoom(1)">🔍+</button>
-    <button class="cap-copy" onclick="showToast('📱 스크린샷을 찍어주세요!');haptic(10)">📱 스크린샷</button>
+    <button class="cap-copy" onclick="capScreenshot()">📸 캡처 저장</button>
     <button class="cap-wa" onclick="waCapMsg()">💬 WhatsApp</button>
   </div>
   <div class="cap-sheet" id="capSheet"></div>
@@ -4444,7 +4442,7 @@ function openCap(ds,mt){
   var h='<div class="cap-date">'+dateStr+'</div>';
   h+='<div class="cap-meal">'+mealLabel+'</div>';
   h+='<div class="cap-totals"><div class="cap-tot-box"><div class="cap-tot-lbl">Korean</div><div class="cap-tot-num">'+gSik+'</div></div><div class="cap-tot-box"><div class="cap-tot-lbl">Dosirak</div><div class="cap-tot-num">'+gDos+'</div></div></div>';
-  h+='<table class="cap-tbl"><thead><tr><th>Room</th><th>Name</th><th>C</th><th>Time</th><th>Remark</th></tr></thead><tbody>';
+  h+='<table class="cap-tbl"><thead><tr><th>ROOM</th><th>NAME</th><th>C</th></tr></thead><tbody>';
 
   _capGroups.forEach(function(grp){
     // ── DELIVERY 그룹 처리 ──
@@ -4455,13 +4453,12 @@ function openCap(ds,mt){
         var cnt=Number(e.count)||0;
         if(!cnt)return;
         dlvTotal+=cnt;
-        var time=e.time?fmtMealTime(e.time):'';
-        dlvRows.push({room:sg.label,name:'',count:String(cnt),time:time,remark:e.note||''});
+        dlvRows.push({room:sg.label,name:'',count:String(cnt)});
       });
       if(!dlvRows.length)return;
-      h+='<tr class="cap-grp" style="background:#fff3cd;border-top:2px solid #f59e0b"><td colspan="5" style="font-weight:700;color:#92400e;text-align:center">DELIVERY ('+dlvTotal+'명)</td></tr>';
+      h+='<tr class="cap-grp" style="background:#fff3cd;border-top:2px solid #f59e0b"><td colspan="3" style="font-weight:700;color:#92400e;text-align:center">DELIVERY ('+dlvTotal+'명)</td></tr>';
       dlvRows.forEach(function(r){
-        h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td><td>'+r.time+'</td><td>'+esc(r.remark)+'</td></tr>';
+        h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td></tr>';
       });
       return;
     }
@@ -4475,15 +4472,14 @@ function openCap(ds,mt){
       var roomLabel=grp.isIBS?_ibsRoomLabel(rm):rm;
       var countStr=cnt>0?String(cnt):'X';
       if(cnt>0)grpTotal+=cnt;
-      var time=e.time?fmtMealTime(e.time):'';
       var guestName=bk?bk.name||'':'';
-      rows.push({room:roomLabel,name:guestName,count:countStr,time:time,remark:e.note||''});
+      rows.push({room:roomLabel,name:guestName,count:countStr});
     });
     if(!rows.length)return; // 그룹 전체 비어있으면 생략
     var flatLabel=grp.label.replace('\n',' ');
-    h+='<tr class="'+(grp.isIBS?'cap-ibs':'cap-grp')+'"><td colspan="2">'+flatLabel+' <span style="font-weight:400;font-size:11px">('+grpTotal+'명)</span></td><td colspan="3"></td></tr>';
+    h+='<tr class="'+(grp.isIBS?'cap-ibs':'cap-grp')+'"><td colspan="3">'+flatLabel+' <span style="font-weight:400;font-size:11px">('+grpTotal+'명)</span></td></tr>';
     rows.forEach(function(r){
-      h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td><td>'+r.time+'</td><td>'+esc(r.remark)+'</td></tr>';
+      h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td></tr>';
     });
   });
 
@@ -4635,9 +4631,83 @@ function capZoom(dir) {
   else { _capZoomLevel = Math.max(50, _capZoomLevel - 15); }
   sheet.style.transform = 'scale(' + (_capZoomLevel / 100) + ')';
   sheet.style.transformOrigin = 'top center';
-  if (_capZoomLevel !== 100) {
-    showToast('🔍 ' + _capZoomLevel + '%');
+  if (_capZoomLevel !== 100) showToast('🔍 ' + _capZoomLevel + '%');
+}
+
+/* ★ 캡처 → 이미지 변환 → 클립보드/다운로드 */
+async function capScreenshot() {
+  const sheet = document.getElementById('capSheet');
+  if (!sheet) return;
+  showToast('📸 이미지 생성 중...');
+  // 줌 리셋해서 원본 크기로 캡처
+  const prevZoom = _capZoomLevel;
+  sheet.style.transform = 'scale(1)';
+  
+  try {
+    // Canvas로 변환
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 2;
+    const w = sheet.scrollWidth;
+    const h = sheet.scrollHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+    
+    // SVG foreignObject 방식으로 HTML→Canvas
+    const data = new XMLSerializer().serializeToString(
+      new DOMParser().parseFromString(
+        '<foreignObject xmlns="http://www.w3.org/1999/xhtml" width="' + w + '" height="' + h + '">' +
+        '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Noto Sans KR,Arial,sans-serif;color:#000;background:#fff;padding:8px;width:' + w + 'px">' +
+        sheet.innerHTML + '</div></foreignObject>',
+        'text/xml'
+      ).documentElement
+    );
+    const svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' + data + '</svg>';
+    const img = new Image();
+    img.onload = async function() {
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(async function(blob) {
+        if (!blob) { showToast('⚠ 이미지 생성 실패'); return; }
+        // 클립보드 복사 시도
+        if (navigator.clipboard && window.ClipboardItem) {
+          try {
+            await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+            showToast('✅ 이미지가 클립보드에 복사됐어요! 카톡에 붙여넣기 하세요');
+          } catch(e) {
+            // 클립보드 실패 → 다운로드
+            downloadBlob(blob);
+          }
+        } else {
+          downloadBlob(blob);
+        }
+      }, 'image/png');
+    };
+    img.onerror = function() {
+      // SVG 방식 실패 → 다운로드 대안
+      showToast('📱 길게 눌러서 이미지를 저장하세요');
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+  } catch(e) {
+    showToast('⚠ 캡처 실패: ' + e.message);
+  } finally {
+    // 줌 복원
+    sheet.style.transform = 'scale(' + (prevZoom / 100) + ')';
   }
+}
+
+function downloadBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'meal_' + (_capDs||'') + '_' + (_capMt||'') + '.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 이미지 다운로드 완료!');
 }
 
 /* ══════════════════════════════════════════════════
