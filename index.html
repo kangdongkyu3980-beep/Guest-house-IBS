@@ -379,6 +379,31 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
   .cal-cell{min-height:64px;padding:5px 4px}.cal-event{font-size:10px;padding:2px 4px}
   .cal-title{font-size:14px;min-width:100px}
   .fab-add{bottom:16px;right:16px;padding:10px 16px;font-size:13px}
+  /* ★ 식사탭 날짜배너 모바일 축소 */
+  .meal-date-banner{padding:10px 12px;gap:6px;flex-direction:column;align-items:stretch}
+  .mdb-title{font-size:14px;gap:6px;flex-wrap:wrap}
+  .mdb-tag{font-size:10px;padding:2px 7px}
+  .mdb-sub{font-size:11px;margin-top:3px}
+  .mdb-actions{gap:5px;justify-content:flex-start}
+  .mdb-actions .btn,.mdb-actions .btn-autofill,.mdb-actions .meal-vacant-tog{font-size:11px!important;padding:5px 10px!important}
+  .meal-top-bar{margin-bottom:10px}
+  .meal-week-label{font-size:13px}
+  .meal-day-cell{padding:8px 2px!important}
+  .meal-day-num{font-size:16px!important}
+  .meal-day-dow{font-size:10px!important}
+  .meal-day-dow span{font-size:8px!important}
+  /* ★ 캡처 화면 모바일 최적화 */
+  .cap-sheet{max-width:100%;padding:6px 8px}
+  .cap-tbl{font-size:10px}
+  .cap-tbl th{font-size:8px;padding:1px 3px}
+  .cap-tbl td{font-size:10px;padding:1px 3px}
+  .cap-totals{gap:12px;margin-bottom:4px}
+  .cap-tot-num{font-size:16px}
+  .cap-meal{font-size:14px;margin:0 0 2px}
+  .cap-tbl th:last-child,.cap-tbl td:last-child{min-width:80px;width:28%}
+  .cap-rm td:nth-child(2){max-width:55px}
+  .cap-bar{padding:4px 8px;gap:4px}
+  .cap-bar button{padding:5px 10px;font-size:11px}
 }
 @media(max-width:1024px){
   .qa-grid{grid-template-columns:1fr 1fr 1fr auto!important}
@@ -4554,6 +4579,48 @@ async function autoLoadFromSheet(){
     console.error('autoLoadFromSheet:',e);
   }
 }
+
+/* ══════════════════════════════════════════════════
+   ★★★ 모바일 스와이프 탭 전환 ★★★
+   ══════════════════════════════════════════════════ */
+(function initSwipe(){
+  const TAB_ORDER=['overview','roommap','checkinout','calendar','stats','meals','guests'];
+  let _sx=0,_sy=0,_swiping=false;
+  const mainEl=document.querySelector('.main');
+  if(!mainEl)return;
+
+  mainEl.addEventListener('touchstart',function(e){
+    const t=e.touches[0];
+    _sx=t.clientX;_sy=t.clientY;_swiping=true;
+  },{passive:true});
+
+  mainEl.addEventListener('touchend',function(e){
+    if(!_swiping)return;_swiping=false;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-_sx;
+    const dy=t.clientY-_sy;
+    // 수평 이동이 60px 이상이고, 수직보다 클 때만 탭 전환
+    if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.2)return;
+    // 입력 필드 위에서는 무시
+    const tag=(e.target.tagName||'').toLowerCase();
+    if(['input','textarea','select'].includes(tag))return;
+    // 모달/오버레이 열려있으면 무시
+    if(document.querySelector('.modal-overlay.open,.cap-overlay.open,.cmd-overlay.open,.drp-overlay.open'))return;
+    
+    const curIdx=TAB_ORDER.indexOf(activeTab);
+    if(curIdx<0)return;
+    let nextIdx=curIdx;
+    if(dx<-60&&curIdx<TAB_ORDER.length-1)nextIdx=curIdx+1; // 왼쪽으로 스와이프 → 다음 탭
+    else if(dx>60&&curIdx>0)nextIdx=curIdx-1; // 오른쪽으로 스와이프 → 이전 탭
+    if(nextIdx!==curIdx){
+      goTab(TAB_ORDER[nextIdx]);
+      // 네비게이션 탭 스크롤 맞추기
+      const navTabs=document.querySelectorAll('.nav-tab');
+      if(navTabs[nextIdx])navTabs[nextIdx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+      if(typeof haptic==='function')haptic(5);
+    }
+  },{passive:true});
+})();
 
 /* ★ 백그라운드 시트 동기화 체크 (로컬 데이터가 있지만 시트가 더 최신일 수 있음) */
 async function silentSheetCheck(){
