@@ -219,15 +219,37 @@ body.dark .today-card-title{color:#93c5fd}
 .cal-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-top:12px;box-shadow:var(--shadow)}
 .cal-detail-title{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border)}
 .cal-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin:10px 0 6px;padding:3px 0}
-/* ── 오늘의 할일 카드 ── */
-.today-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--r);padding:0;box-shadow:var(--shadow-md);margin-bottom:16px;overflow:hidden}
-.today-card-header{padding:12px 18px;background:var(--accent-light);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.today-card-title{font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px}
-.today-card-date{font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace}
-.today-card-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0}
-.today-item{padding:14px 18px;border-right:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;border-bottom:2px solid transparent;user-select:none}
-.today-item:last-child{border-right:none}
-.today-item:hover{background:var(--surface2)}
+/* ── 모닝 대시보드 ── */
+.today-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:0;box-shadow:var(--shadow-md);margin-bottom:16px;overflow:hidden}
+.morning-header{padding:16px 18px 12px;background:linear-gradient(135deg,var(--accent) 0%,#1d4ed8 100%);color:#fff}
+.morning-greeting{font-size:16px;font-weight:700;margin-bottom:2px}
+.morning-date{font-size:12px;opacity:.85;font-family:'JetBrains Mono',monospace}
+.morning-summary{font-size:11px;opacity:.7;margin-top:4px}
+.morning-alert{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .15s}
+.morning-alert:hover{filter:brightness(.95)}
+.morning-alert-red{background:var(--red-light);border-bottom:1px solid rgba(220,38,38,.2)}
+.morning-alert-icon{font-size:18px;flex-shrink:0}
+.morning-alert-body{flex:1;min-width:0}
+.morning-alert-title{font-size:13px;font-weight:700;color:var(--red)}
+.morning-alert-names{font-size:11px;color:var(--red);opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.morning-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.morning-card{padding:14px 16px;cursor:pointer;transition:background .15s;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative}
+.morning-card:nth-child(2n){border-right:none}
+.morning-card:nth-last-child(-n+2){border-bottom:none}
+.morning-card:hover{background:var(--surface2)}
+.morning-card:active{background:var(--accent-light)}
+.mc-icon{font-size:20px;margin-bottom:4px}
+.mc-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.mc-count{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1.2}
+.mc-in .mc-count{color:var(--green)}
+.mc-out .mc-count{color:var(--orange)}
+.mc-meal .mc-count{color:var(--accent)}
+.mc-chef .mc-count{color:var(--purple)}
+.mc-names{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.morning-upcoming{padding:10px 16px;background:var(--orange-light);font-size:12px;color:var(--orange);border-bottom:1px solid rgba(234,88,12,.15);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.morning-warn{padding:10px 16px;background:var(--yellow-light);font-size:12px;color:var(--yellow);cursor:pointer;font-weight:600;border-bottom:1px solid rgba(202,138,4,.15)}
+.morning-warn:hover{filter:brightness(.95)}
+body.dark .morning-header{background:linear-gradient(135deg,#1e40af 0%,#1e3a8a 100%)}
 .today-item.ti-active{background:var(--accent-light);border-bottom-color:var(--accent)}
 .today-item-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:4px}
 .today-item-count{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;margin-bottom:3px}
@@ -1613,60 +1635,92 @@ function renderTodayCard(){
   const todayOut=DATA.filter(b=>b.check_out===TODAYSTR);
   const confirms=DATA.filter(b=>{const s=statusOf(b);return(s==='active')&&(!b.check_out||b.check_out==='')&&!b.longterm;});
   const payPending=DATA.filter(b=>['active','longterm'].includes(statusOf(b))&&(!b.payment||b.payment==='미정'));
-  // 6. 오늘 식수 연동
+  // 체크아웃 지난 미처리 (과거 체크아웃인데 아직 active)
+  const overdue=DATA.filter(b=>{
+    if(!b.check_out||b.longterm)return false;
+    const co=pd(b.check_out);
+    if(!co)return false;
+    return co<TODAY&&['active'].includes(statusOf(b));
+  });
+  // 식수
   const todayMeals=getMeals(TODAYSTR);
   const mealTotals=todayMeals.map(mt=>({mt,...mtTotal(TODAYSTR,mt)}));
   const mealGrand=mealTotals.reduce((s,t)=>s+t.total,0);
+  const _mealIcon={bf:'🌅 조식',ln:'☀️ 중식',dn:'🌙 석식'};
+  // 셰프 메시지 전송 여부
+  const sentToday=todayMeals.filter(mt=>MEAL_SENT&&MEAL_SENT[TODAYSTR+'_'+mt]).length;
+  const totalMealSlots=todayMeals.length;
+  // 내일 체크인
+  const tmrw=d2s(addDays(TODAY,1));
+  const tmrwIn=DATA.filter(b=>b.check_in===tmrw);
+  // 현재 투숙
+  const allActive=DATA.filter(b=>['active','longterm'].includes(statusOf(b)));
+
   const el=document.getElementById('todayCard');
   if(!el)return;
-  if(!todayIn.length&&!todayOut.length&&!confirms.length&&!payPending.length&&!mealGrand){el.style.display='none';return;}
   el.style.display='block';
   todayOpenSection=null;
   todaySectionIds['in']=todayIn.map(b=>b.id);
   todaySectionIds['out']=todayOut.map(b=>b.id);
   todaySectionIds['warn']=confirms.map(b=>b.id);
   todaySectionIds['pay']=payPending.map(b=>b.id);
+  todaySectionIds['overdue']=overdue.map(b=>b.id);
 
-  const mkItem=(key,cls,icon,label,count,names)=>`
-    <div class="today-item ${cls}" id="titem-${key}" onclick="toggleTodaySection('${key}')" title="클릭해서 상세 보기">
-      <div class="today-item-label">${icon} ${label}</div>
-      <div class="today-item-count">${count}</div>
-      <div class="today-item-names">${names}</div>
-    </div>`;
-
-  const _mealIcon={bf:'🌅',ln:'☀️',dn:'🌙'};
-  const mealItem=mealGrand?`
-    <div class="today-item ti-meal" onclick="goTab('meals')" title="식사 탭으로 이동" style="cursor:pointer">
-      <div class="today-item-label">🍱 오늘 식수</div>
-      <div class="today-item-count">${mealGrand}</div>
-      <div class="today-item-names">${mealTotals.filter(t=>t.total>0).map(t=>`${_mealIcon[t.mt]}${t.total}`).join(' · ')}</div>
-    </div>`:'';
+  // 시간대별 인사
+  const hr=new Date().getHours();
+  const greeting=hr<12?'🌅 좋은 아침이에요':hr<18?'☀️ 오후도 화이팅':'🌙 수고했어요';
 
   el.innerHTML=`
-    <div class="today-card-header">
-      <div class="today-card-title">📋 오늘의 할일</div>
-      <div class="today-card-date">${todayLabel}</div>
+    <div class="morning-header">
+      <div class="morning-greeting">${greeting}</div>
+      <div class="morning-date">${todayLabel}</div>
+      <div class="morning-summary">${allActive.length}명 투숙중 · ${todayIn.length} IN / ${todayOut.length} OUT</div>
     </div>
-    <div class="today-card-body">
-      <div class="today-item ti-in" onclick="goTab('checkinout')" title="체크인/아웃 탭으로 이동" style="cursor:pointer">
-        <div class="today-item-label">🛬 오늘 체크인</div>
-        <div class="today-item-count">${todayIn.length}</div>
-        <div class="today-item-names">${todayIn.map(b=>esc(b.name)||'?').join(', ')||'없음'}</div>
-      </div>
-      <div class="today-item ti-out" onclick="goTab('checkinout')" title="체크인/아웃 탭으로 이동" style="cursor:pointer">
-        <div class="today-item-label">🛫 오늘 체크아웃</div>
-        <div class="today-item-count">${todayOut.length}</div>
-        <div class="today-item-names">${todayOut.map(b=>esc(b.name)||'?').join(', ')||'없음'}</div>
-      </div>
 
-      ${mealItem ? '' : ''}
-      ${confirms.length?`
-      <div class="today-item ti-warn" onclick="toggleTodaySection('warn')" title="클릭해서 상세 보기" style="cursor:pointer">
-        <div class="today-item-label">⚠ 체크아웃 미정</div>
-        <div class="today-item-count">${confirms.length}</div>
-        <div class="today-item-names">${confirms.slice(0,3).map(b=>esc(b.name)||'?').join(', ')}${confirms.length>3?'…':''}</div>
-      </div>`:''}
+    ${overdue.length?`<div class="morning-alert morning-alert-red" onclick="toggleTodaySection('overdue')">
+      <span class="morning-alert-icon">🚨</span>
+      <div class="morning-alert-body">
+        <div class="morning-alert-title">체크아웃 지남 ${overdue.length}건</div>
+        <div class="morning-alert-names">${overdue.map(b=>`${b.bldgId}-${b.room} ${esc(b.name)} (${b.check_out})`).join(' / ')}</div>
+      </div>
+    </div>`:''}
+
+    <div class="morning-grid">
+      <div class="morning-card mc-in" onclick="goTab('checkinout')">
+        <div class="mc-icon">🛬</div>
+        <div class="mc-label">체크인</div>
+        <div class="mc-count">${todayIn.length}</div>
+        <div class="mc-names">${todayIn.slice(0,3).map(b=>esc(b.name)||'?').join(', ')||'없음'}${todayIn.length>3?'…':''}</div>
+      </div>
+      <div class="morning-card mc-out" onclick="goTab('checkinout')">
+        <div class="mc-icon">🛫</div>
+        <div class="mc-label">체크아웃</div>
+        <div class="mc-count">${todayOut.length}</div>
+        <div class="mc-names">${todayOut.slice(0,3).map(b=>esc(b.name)||'?').join(', ')||'없음'}${todayOut.length>3?'…':''}</div>
+      </div>
+      <div class="morning-card mc-meal" onclick="goTab('meals')">
+        <div class="mc-icon">🍽</div>
+        <div class="mc-label">오늘 식수</div>
+        <div class="mc-count">${mealGrand||'미입력'}</div>
+        <div class="mc-names">${mealTotals.filter(t=>t.total>0).map(t=>`${_mealIcon[t.mt]} ${t.total}`).join(' · ')||'탭해서 입력'}</div>
+      </div>
+      <div class="morning-card mc-chef" onclick="goTab('meals')">
+        <div class="mc-icon">${sentToday===totalMealSlots?'✅':'📤'}</div>
+        <div class="mc-label">셰프 메시지</div>
+        <div class="mc-count">${sentToday}/${totalMealSlots}</div>
+        <div class="mc-names">${sentToday===totalMealSlots?'전송 완료':'미전송 — 탭해서 보내기'}</div>
+      </div>
     </div>
+
+    ${tmrwIn.length?`<div class="morning-upcoming">
+      <span style="font-weight:700">📆 내일 체크인 ${tmrwIn.length}명</span>
+      <span style="color:var(--text2)">${tmrwIn.map(b=>esc(b.name)||'?').join(', ')}</span>
+    </div>`:''}
+
+    ${confirms.length?`<div class="morning-warn" onclick="toggleTodaySection('warn')">
+      ⚠ 체크아웃 미정 ${confirms.length}건 — ${confirms.slice(0,2).map(b=>esc(b.name)).join(', ')}${confirms.length>2?'…':''}
+    </div>`:''}
+
     <div class="today-detail" id="todayDetail"></div>`;
 }
 
