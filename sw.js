@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ibs-dashboard-v3';
+const CACHE_NAME = 'ibs-dashboard-v4';
 const ASSETS = [
   './',
   './index.html',
