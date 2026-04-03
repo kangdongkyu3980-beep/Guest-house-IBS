@@ -894,21 +894,24 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 .cap-overlay{display:none;position:fixed;inset:0;z-index:700;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom}
 .cap-overlay.open{display:block}
 .cap-sheet{max-width:100%;margin:0 auto;padding:8px;font-family:'Noto Sans KR',Arial,sans-serif;color:#000;background:#fff;transform-origin:top left}
-.cap-date{font-size:10px;font-weight:700;color:#555;text-align:center}
-.cap-meal{font-size:14px;font-weight:800;text-align:center;margin:0 0 2px;color:#000}
-.cap-totals{display:flex;justify-content:center;gap:14px;margin-bottom:4px}
+.cap-date{font-size:11px;font-weight:600;color:#000;text-align:center;margin-bottom:2px}
+.cap-meal{font-size:16px;font-weight:800;text-align:center;margin:0 0 4px;color:#000;letter-spacing:1px}
+.cap-totals{display:flex;justify-content:center;gap:24px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #000}
 .cap-tot-box{text-align:center}
-.cap-tot-lbl{font-size:8px;color:#999;font-weight:600}
-.cap-tot-num{font-size:16px;font-weight:800;line-height:1}
+.cap-tot-lbl{font-size:9px;color:#000;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.cap-tot-num{font-size:20px;font-weight:800;line-height:1.2;color:#000}
 .cap-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:2px;table-layout:auto}
-.cap-tbl th{background:#f5f5f5;padding:1px 4px;text-align:left;font-size:8px;font-weight:700;border:1px solid #ddd;color:#666;white-space:nowrap}
-.cap-tbl td{padding:1px 4px;border:1px solid #e0e0e0;font-size:10px;line-height:1.2}
-.cap-grp td{background:#e8f0fe;font-weight:800;color:#1a73e8;border-bottom:1.5px solid #1a73e8!important;font-size:10px;padding:1px 4px}
-.cap-ibs td{background:#e8f5e9;font-weight:800;color:#2e7d32;border-bottom:1.5px solid #2e7d32!important;padding:1px 4px}
-.cap-rm td:nth-child(1){font-weight:600;white-space:nowrap;width:1%;padding-right:8px}
-.cap-rm td:nth-child(2){font-size:10px;color:#444}
-.cap-rm td:nth-child(3){text-align:center;font-weight:700;white-space:nowrap;width:1%}
-.cap-note{font-size:8px;color:#999;margin-top:2px;padding:2px 4px;background:#fafafa;border:1px solid #eee;border-radius:3px}
+.cap-tbl th{background:#f0f0f0;padding:3px 6px;text-align:left;font-size:9px;font-weight:700;border:1px solid #ccc;color:#000;text-transform:uppercase;letter-spacing:.3px}
+.cap-tbl td{padding:2px 6px;border:1px solid #ddd;font-size:11px;line-height:1.3;color:#000}
+.cap-grp td{background:#e3edf9;font-weight:800;color:#1a5cb0;border-bottom:2px solid #1a5cb0!important;font-size:11px;padding:3px 6px}
+.cap-ibs td{background:#e0f2e5;font-weight:800;color:#1b6e32;border-bottom:2px solid #1b6e32!important;padding:3px 6px}
+.cap-rm td:nth-child(1){font-weight:700;white-space:nowrap;width:1%;color:#000}
+.cap-rm td:nth-child(2){white-space:nowrap;width:1%;color:#000}
+.cap-rm td:nth-child(3){text-align:center;font-weight:700;white-space:nowrap;width:1%;color:#000}
+.cap-rm td:nth-child(4){white-space:nowrap;width:1%;color:#000;font-size:10px}
+.cap-rm td:nth-child(5){color:#000;font-size:10px;word-break:break-word}
+.cap-rm:nth-child(even) td{background:#fafafa}
+.cap-note{font-size:9px;color:#000;margin-top:4px;padding:3px 6px;background:#f5f5f5;border:1px solid #ddd;border-radius:3px;font-weight:600}
 .cap-bar{position:sticky;top:0;z-index:10;background:#fff;padding:4px 8px;display:flex;gap:4px;justify-content:center;border-bottom:2px solid #1a73e8;flex-wrap:nowrap}
 .cap-bar button{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
 .cap-zoom{background:#f0f0f0;color:#333;padding:6px 10px!important;min-width:36px}
@@ -4442,10 +4445,9 @@ function openCap(ds,mt){
   var h='<div class="cap-date">'+dateStr+'</div>';
   h+='<div class="cap-meal">'+mealLabel+'</div>';
   h+='<div class="cap-totals"><div class="cap-tot-box"><div class="cap-tot-lbl">Korean</div><div class="cap-tot-num">'+gSik+'</div></div><div class="cap-tot-box"><div class="cap-tot-lbl">Dosirak</div><div class="cap-tot-num">'+gDos+'</div></div></div>';
-  h+='<table class="cap-tbl"><thead><tr><th>ROOM</th><th>NAME</th><th>C</th></tr></thead><tbody>';
+  h+='<table class="cap-tbl"><thead><tr><th>ROOM</th><th>NAME</th><th>C</th><th>TIME</th><th>REMARK</th></tr></thead><tbody>';
 
   _capGroups.forEach(function(grp){
-    // ── DELIVERY 그룹 처리 ──
     if(grp.isDelivery){
       var dlvRows=[];var dlvTotal=0;
       grp.subGroups.forEach(function(sg){
@@ -4453,33 +4455,34 @@ function openCap(ds,mt){
         var cnt=Number(e.count)||0;
         if(!cnt)return;
         dlvTotal+=cnt;
-        dlvRows.push({room:sg.label,name:'',count:String(cnt)});
+        var time=e.time?fmtMealTime(e.time):'';
+        dlvRows.push({room:sg.label,name:'',count:String(cnt),time:time,remark:e.note||''});
       });
       if(!dlvRows.length)return;
-      h+='<tr class="cap-grp" style="background:#fff3cd;border-top:2px solid #f59e0b"><td colspan="3" style="font-weight:700;color:#92400e;text-align:center">DELIVERY ('+dlvTotal+'명)</td></tr>';
+      h+='<tr class="cap-grp" style="background:#fff3cd;border-top:2px solid #f59e0b"><td colspan="5" style="font-weight:700;color:#92400e;text-align:center">DELIVERY ('+dlvTotal+'명)</td></tr>';
       dlvRows.forEach(function(r){
-        h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td></tr>';
+        h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td><td>'+r.time+'</td><td>'+esc(r.remark)+'</td></tr>';
       });
       return;
     }
-    // ── 일반 그룹 처리 ──
     var grpTotal=0;var rows=[];
     grp.rooms.forEach(function(rm){
       var e=getEntry(ds,mt,grp.bId,rm);
       var cnt=Number(e.count)||0;
       var bk=getBookingOnDate(grp.bId,rm,ds);
-      if(!bk&&!cnt)return; // 공실+식수없음 → 생략
+      if(!bk&&!cnt)return;
       var roomLabel=grp.isIBS?_ibsRoomLabel(rm):rm;
       var countStr=cnt>0?String(cnt):'X';
       if(cnt>0)grpTotal+=cnt;
+      var time=e.time?fmtMealTime(e.time):'';
       var guestName=bk?bk.name||'':'';
-      rows.push({room:roomLabel,name:guestName,count:countStr});
+      rows.push({room:roomLabel,name:guestName,count:countStr,time:time,remark:e.note||''});
     });
-    if(!rows.length)return; // 그룹 전체 비어있으면 생략
+    if(!rows.length)return;
     var flatLabel=grp.label.replace('\n',' ');
-    h+='<tr class="'+(grp.isIBS?'cap-ibs':'cap-grp')+'"><td colspan="3">'+flatLabel+' <span style="font-weight:400;font-size:11px">('+grpTotal+'명)</span></td></tr>';
+    h+='<tr class="'+(grp.isIBS?'cap-ibs':'cap-grp')+'"><td colspan="5">'+flatLabel+' <span style="font-weight:400;font-size:11px">('+grpTotal+'명)</span></td></tr>';
     rows.forEach(function(r){
-      h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td></tr>';
+      h+='<tr class="cap-rm"><td>'+r.room+'</td><td>'+esc(r.name)+'</td><td>'+r.count+'</td><td>'+r.time+'</td><td>'+esc(r.remark)+'</td></tr>';
     });
   });
 
