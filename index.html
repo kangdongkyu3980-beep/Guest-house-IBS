@@ -221,10 +221,10 @@ body.dark .today-card-title{color:#93c5fd}
 .cal-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin:10px 0 6px;padding:3px 0}
 /* ── 모닝 대시보드 ── */
 .today-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:0;box-shadow:var(--shadow-md);margin-bottom:16px;overflow:hidden}
-.morning-header{padding:16px 18px 12px;background:linear-gradient(135deg,var(--accent) 0%,#1d4ed8 100%);color:#fff}
-.morning-greeting{font-size:16px;font-weight:700;margin-bottom:2px}
-.morning-date{font-size:12px;opacity:.85;font-family:'JetBrains Mono',monospace}
-.morning-summary{font-size:11px;opacity:.7;margin-top:4px}
+.morning-header{padding:10px 16px 8px;background:linear-gradient(135deg,var(--accent) 0%,#1d4ed8 100%);color:#fff}
+.morning-greeting{font-size:14px;font-weight:700;margin-bottom:1px}
+.morning-date{font-size:11px;opacity:.85;font-family:'JetBrains Mono',monospace}
+.morning-summary{font-size:10px;opacity:.7;margin-top:2px}
 .morning-alert{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .15s}
 .morning-alert:hover{filter:brightness(.95)}
 .morning-alert-red{background:var(--red-light);border-bottom:1px solid rgba(220,38,38,.2)}
@@ -233,23 +233,35 @@ body.dark .today-card-title{color:#93c5fd}
 .morning-alert-title{font-size:13px;font-weight:700;color:var(--red)}
 .morning-alert-names{font-size:11px;color:var(--red);opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .morning-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.morning-card{padding:14px 16px;cursor:pointer;transition:background .15s;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative}
+.morning-card{padding:7px 12px;cursor:pointer;transition:background .15s;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative}
 .morning-card:nth-child(2n){border-right:none}
 .morning-card:nth-last-child(-n+2){border-bottom:none}
 .morning-card:hover{background:var(--surface2)}
 .morning-card:active{background:var(--accent-light)}
-.mc-icon{font-size:20px;margin-bottom:4px}
-.mc-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
-.mc-count{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1.2}
+.mc-icon{font-size:14px;margin-bottom:1px;display:inline}
+.mc-label{font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:inline;margin-left:4px}
+.mc-count{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;line-height:1.1;display:inline;margin-left:8px}
 .mc-in .mc-count{color:var(--green)}
 .mc-out .mc-count{color:var(--orange)}
-.mc-meal .mc-count{color:var(--accent)}
-.mc-chef .mc-count{color:var(--purple)}
-.mc-names{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
-.morning-upcoming{padding:10px 16px;background:var(--orange-light);font-size:12px;color:var(--orange);border-bottom:1px solid rgba(234,88,12,.15);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.morning-warn{padding:10px 16px;background:var(--yellow-light);font-size:12px;color:var(--yellow);cursor:pointer;font-weight:600;border-bottom:1px solid rgba(202,138,4,.15)}
+.mc-names{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.morning-upcoming{padding:8px 14px;background:var(--orange-light);font-size:11px;color:var(--orange);border-bottom:1px solid rgba(234,88,12,.15);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.morning-warn{padding:8px 14px;background:var(--yellow-light);font-size:11px;color:var(--yellow);cursor:pointer;font-weight:600;border-bottom:1px solid rgba(202,138,4,.15)}
 .morning-warn:hover{filter:brightness(.95)}
 body.dark .morning-header{background:linear-gradient(135deg,#1e40af 0%,#1e3a8a 100%)}
+/* ── 날짜별 메모장 ── */
+.daily-memo-wrap{border-top:1px solid var(--border);padding:0}
+.dm-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);gap:6px}
+.dm-date{font-size:12px;font-weight:700;color:var(--text);text-align:center;flex:1}
+.dm-nav{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.dm-nav:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.dm-input{width:100%;padding:10px 14px;border:none;border-top:1px solid var(--border);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);color:var(--text);outline:none;resize:vertical;min-height:80px;line-height:1.6}
+.dm-input::placeholder{color:var(--text3)}
+.dm-input:focus{background:var(--yellow-light)}
+.dm-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface2);border-top:1px solid var(--border)}
+.dm-status{font-size:10px;color:var(--text3)}
+.dm-save-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.dm-save-btn:hover{background:#1d4ed8}
+.dm-save-btn.saved{background:var(--green)}
 .today-item.ti-active{background:var(--accent-light);border-bottom-color:var(--accent)}
 .today-item-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:4px}
 .today-item-count{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;margin-bottom:3px}
@@ -392,7 +404,15 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
   .header{padding:0 10px;height:auto;min-height:46px;padding-top:6px;padding-bottom:6px;flex-wrap:wrap}
   .header-logo{font-size:13px;flex-shrink:0}
   .header-date{font-size:11px;padding:3px 8px}
-  .global-search-wrap{min-width:100%;max-width:100%;order:10;margin-top:4px}
+  .global-search-wrap{min-width:auto!important;max-width:40px!important;overflow:hidden;transition:max-width .3s}
+  .global-search-wrap.expanded{max-width:100%!important;min-width:100%!important}
+  .global-search-wrap:not(.expanded) input{opacity:0;pointer-events:none;width:0;padding:0}
+  .global-search-wrap:not(.expanded) .global-search-icon{pointer-events:all;cursor:pointer;padding:6px}
+  /* ★ 모달 추가 필드 접기 */
+  .modal-extra-fields{display:none}
+  .modal-extra-fields.show{display:block}
+  .modal-extra-toggle{text-align:center;padding:8px;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;border-top:1px dashed var(--border);margin-top:8px}
+  .modal-extra-toggle:hover{background:var(--accent-light)}
   .header-actions{margin-left:0;width:100%;padding-bottom:2px;gap:4px;flex-wrap:wrap}.header-actions .btn{font-size:10px;padding:4px 7px}.sync-badge{font-size:10px;padding:2px 7px}
   .header-actions .btn span.btn-label{display:none}
   .nav{padding:0 4px;overflow-x:auto;-webkit-overflow-scrolling:touch}.nav-tab{padding:8px 10px;font-size:11px;flex-shrink:0}.main{padding:10px 8px}
@@ -533,8 +553,8 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
 .meal-rooms-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
 .meal-bldg-group:last-child .meal-rooms-grid{border-bottom:none}
 
-/* 방 행 — 컴팩트 */
-.meal-room-row{display:grid;grid-template-columns:72px minmax(0,1fr) 82px 104px 90px;gap:7px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:background .1s;min-height:42px}
+/* 방 행 — 터치 최적화 */
+.meal-room-row{display:grid;grid-template-columns:72px minmax(0,1fr) 90px 104px 90px;gap:7px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:background .1s;min-height:48px}
 .meal-room-row:nth-child(even){border-right:none}
 .meal-room-row:hover{background:var(--surface2)}
 .meal-room-row.mrr-has-data{background:linear-gradient(90deg,rgba(37,99,235,.04) 0%,transparent 60%)}
@@ -546,9 +566,9 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
 .mrr-empty-label{font-size:10px;color:var(--text3);font-style:italic}
 
 /* +/− 카운터 */
-.mrr-cnt-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface);height:30px}
-.mrr-cnt-btn{width:24px;height:100%;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;font-weight:700;padding:0}
-.mrr-cnt-btn:hover{background:var(--surface2);color:var(--text)}
+.mrr-cnt-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface);height:36px}
+.mrr-cnt-btn{width:36px;height:100%;border:none;background:transparent;cursor:pointer;font-size:18px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background .1s;flex-shrink:0;font-weight:700;padding:0}
+.mrr-cnt-btn:hover,.mrr-cnt-btn:active{background:var(--accent-light);color:var(--accent)}
 .meal-cnt{width:26px;height:100%;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:center;background:var(--surface);color:var(--text);outline:none;-moz-appearance:textfield;padding:0}
 .meal-cnt::-webkit-outer-spin-button,.meal-cnt::-webkit-inner-spin-button{-webkit-appearance:none}
 .meal-cnt:focus{background:var(--accent-light)}
@@ -946,9 +966,9 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 <div class="header">
   <div class="header-logo">IBS · GUEST</div>
   <div class="header-date" id="headerDate"></div>
-  <div class="global-search-wrap">
-    <span class="global-search-icon">🔍</span>
-    <input type="text" id="globalSearch" placeholder="이름, 회사, 룸 검색..." oninput="globalSearchFn(this.value)">
+  <div class="global-search-wrap" id="searchWrap">
+    <span class="global-search-icon" onclick="expandSearch()">🔍</span>
+    <input type="text" id="globalSearch" placeholder="이름, 회사, 룸 검색..." oninput="globalSearchFn(this.value)" onblur="collapseSearch()">
   </div>
   <div class="header-actions">
     <span class="sync-badge" id="syncBadge" onclick="manualSync()" style="cursor:pointer" title="탭하여 수동 동기화">🟢 자동저장 켜짐</span>
@@ -962,12 +982,12 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 </div>
 <nav class="nav" role="tablist" aria-label="대시보드 탭 네비게이션" onkeydown="navKeyHandler(event)">
   <div class="nav-tab active" onclick="goTab('overview')" role="tab" aria-selected="true" aria-controls="tab-overview" tabindex="0">📊 개요</div>
-  <div class="nav-tab" onclick="goTab('roommap')" role="tab" aria-selected="false" aria-controls="tab-roommap" tabindex="-1">🏨 룸맵</div>
-  <div class="nav-tab" onclick="goTab('checkinout')" role="tab" aria-selected="false" aria-controls="tab-checkinout" tabindex="-1">🛬 체크인/아웃</div>
-  <div class="nav-tab" onclick="goTab('calendar')" role="tab" aria-selected="false" aria-controls="tab-calendar" tabindex="-1">📅 달력</div>
-  <div class="nav-tab" onclick="goTab('stats')" role="tab" aria-selected="false" aria-controls="tab-stats" tabindex="-1">📈 통계</div>
   <div class="nav-tab" onclick="goTab('meals')" role="tab" aria-selected="false" aria-controls="tab-meals" tabindex="-1">🍱 식사</div>
+  <div class="nav-tab" onclick="goTab('roommap')" role="tab" aria-selected="false" aria-controls="tab-roommap" tabindex="-1">🏨 룸맵</div>
+  <div class="nav-tab" onclick="goTab('checkinout')" role="tab" aria-selected="false" aria-controls="tab-checkinout" tabindex="-1">🛬 IN/OUT</div>
+  <div class="nav-tab" onclick="goTab('calendar')" role="tab" aria-selected="false" aria-controls="tab-calendar" tabindex="-1">📅 달력</div>
   <div class="nav-tab" onclick="goTab('guests')" role="tab" aria-selected="false" aria-controls="tab-guests" tabindex="-1">👤 게스트</div>
+  <div class="nav-tab" onclick="goTab('stats')" role="tab" aria-selected="false" aria-controls="tab-stats" tabindex="-1">📈 통계</div>
 </nav>
 <div class="main" role="main">
   <!-- 개요 탭 -->
@@ -1097,8 +1117,10 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
         <span id="ltQuickLabel" style="font-size:11px;color:var(--text3)">체크아웃 없이 저장</span>
       </div>
       <div class="form-row"><label class="form-label" for="inName">이름 *</label><div class="ac-wrap"><input class="form-input" type="text" id="inName" placeholder="투숙자 이름" autocomplete="off" oninput="acInput('inName','acName',getNameSuggestions)" onchange="if(typeof smartDefaults==='function')smartDefaults(this.value)"><div class="ac-list" id="acName"></div></div></div>
-      <div class="form-row"><label class="form-label" for="inRoom">룸 변경</label><select class="form-select" id="inRoom"></select></div>
       <div class="form-row"><label class="form-label" for="inCompany">회사</label><div class="ac-wrap"><input class="form-input" type="text" id="inCompany" placeholder="회사명" autocomplete="off" oninput="acInput('inCompany','acCompany',getCompanySuggestions)"><div class="ac-list" id="acCompany"></div></div></div>
+      <div class="modal-extra-toggle" id="extraToggle" onclick="toggleExtraFields()">▼ 추가 정보 입력</div>
+      <div class="modal-extra-fields" id="extraFields">
+      <div class="form-row"><label class="form-label" for="inRoom">룸 변경</label><select class="form-select" id="inRoom"></select></div>
       <div class="date-row form-row">
         <div><label class="form-label" for="inPhone">전화번호</label><input class="form-input" type="tel" id="inPhone" placeholder="+91 / +82 ..." class="input-masked" oninput="if(typeof maskPhone==='function')maskPhone(this)"></div>
         <div><label class="form-label" for="inEmail">이메일</label><input class="form-input" type="email" id="inEmail" placeholder="email@company.com"></div>
@@ -1113,6 +1135,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
         <input class="form-input" type="text" id="inPayment" placeholder="직접 입력 가능">
       </div>
       <div class="form-row"><label class="form-label" for="inRemark">비고</label><input class="form-input" type="text" id="inRemark" placeholder="메모 (선택)"></div>
+      </div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal()">닫기</button><button class="btn btn-primary" onclick="saveBooking()">✓ 저장</button></div>
@@ -1377,7 +1400,18 @@ function toggleDark(){
   localStorage.setItem('ibs_dark',on?'1':'0');
   document.getElementById('btnDark').textContent=on?'☀️':'🌙';
 }
-(function initDark(){if(localStorage.getItem('ibs_dark')==='1'){document.body.classList.add('dark');document.getElementById('btnDark').textContent='☀️';}})();
+(function initDark(){
+  const saved=localStorage.getItem('ibs_dark');
+  const systemDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const isDark=saved!==null?(saved==='1'):systemDark;
+  if(isDark){document.body.classList.add('dark');document.getElementById('btnDark').textContent='☀️';}
+  // 시스템 변경 감지
+  if(window.matchMedia)window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{
+    if(localStorage.getItem('ibs_dark')!==null)return; // 수동 설정 있으면 무시
+    if(e.matches){document.body.classList.add('dark');document.getElementById('btnDark').textContent='☀️';}
+    else{document.body.classList.remove('dark');document.getElementById('btnDark').textContent='🌙';}
+  });
+})();
 
 /* ── 자동저장 (탭 닫기 / 창 닫기) ── */
 function buildDailySnapshot(source){
@@ -1586,7 +1620,7 @@ function buildRoomSelect(bldgId,room){return BUILDINGS.map(bg=>`<optgroup label=
 let activeProp=localStorage.getItem('ibs_prop')||'gh';
 let activeTab=localStorage.getItem('ibs_tab')||'overview';
 function setProp(p){activeProp=p;localStorage.setItem('ibs_prop',p);document.getElementById('propBtnGH').className='prop-btn'+(p==='gh'?' active':'');document.getElementById('propBtnIBS').className='prop-btn'+(p==='ibs'?' active-ibs':'');renderOverview();}
-function goTab(name){if(typeof _saveCtx==='function')_saveCtx(activeTab);activeTab=name;localStorage.setItem('ibs_tab',name);document.querySelectorAll('.nav-tab').forEach((t,i)=>{const isActive=['overview','roommap','checkinout','calendar','stats','meals','guests'][i]===name;t.classList.toggle('active',isActive);t.setAttribute('aria-selected',isActive);t.tabIndex=isActive?0:-1;});document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));try{if(name==='roommap'){renderBldgList();selectBldg(activeBldg||'B');}else if(name==='checkinout')renderCheckinOut();else if(name==='guests')renderGuests();else if(name==='calendar')renderCalendar();else if(name==='stats')renderStats();else if(name==='meals')renderMeals();else renderOverview();}catch(e){console.error('goTab:',e);}if(typeof _restoreCtx==='function')_restoreCtx(name);if(typeof _updateFAB==='function')_updateFAB();
+function goTab(name){if(typeof _saveCtx==='function')_saveCtx(activeTab);activeTab=name;localStorage.setItem('ibs_tab',name);document.querySelectorAll('.nav-tab').forEach((t,i)=>{const isActive=['overview','meals','roommap','checkinout','calendar','guests','stats'][i]===name;t.classList.toggle('active',isActive);t.setAttribute('aria-selected',isActive);t.tabIndex=isActive?0:-1;});document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+name));try{if(name==='roommap'){renderBldgList();selectBldg(activeBldg||'B');}else if(name==='checkinout')renderCheckinOut();else if(name==='guests')renderGuests();else if(name==='calendar')renderCalendar();else if(name==='stats')renderStats();else if(name==='meals')renderMeals();else renderOverview();}catch(e){console.error('goTab:',e);}if(typeof _restoreCtx==='function')_restoreCtx(name);if(typeof _updateFAB==='function')_updateFAB();
   if(typeof _renderTrash==='function')_renderTrash();}
 
 /* ── 개요 ── */
@@ -1698,17 +1732,18 @@ function renderTodayCard(){
         <div class="mc-count">${todayOut.length}</div>
         <div class="mc-names">${todayOut.slice(0,3).map(b=>esc(b.name)||'?').join(', ')||'없음'}${todayOut.length>3?'…':''}</div>
       </div>
-      <div class="morning-card mc-meal" onclick="goTab('meals')">
-        <div class="mc-icon">🍽</div>
-        <div class="mc-label">오늘 식수</div>
-        <div class="mc-count">${mealGrand||'미입력'}</div>
-        <div class="mc-names">${mealTotals.filter(t=>t.total>0).map(t=>`${_mealIcon[t.mt]} ${t.total}`).join(' · ')||'탭해서 입력'}</div>
+    </div>
+
+    <div class="daily-memo-wrap">
+      <div class="dm-header">
+        <button class="dm-nav" onclick="shiftMemoDate(-1)">◀</button>
+        <div class="dm-date" id="dmDateLabel">📝 ${todayLabel} 메모</div>
+        <button class="dm-nav" onclick="shiftMemoDate(1)">▶</button>
       </div>
-      <div class="morning-card mc-chef" onclick="goTab('meals')">
-        <div class="mc-icon">${sentToday===totalMealSlots?'✅':'📤'}</div>
-        <div class="mc-label">셰프 메시지</div>
-        <div class="mc-count">${sentToday}/${totalMealSlots}</div>
-        <div class="mc-names">${sentToday===totalMealSlots?'전송 완료':'미전송 — 탭해서 보내기'}</div>
+      <textarea class="dm-input" id="dmInput" placeholder="오늘 할일, 전달사항, 메모..." oninput="dmChanged()">${esc(getDailyMemo(TODAYSTR))}</textarea>
+      <div class="dm-footer">
+        <span class="dm-status" id="dmStatus">${getDailyMemo(TODAYSTR)?'저장됨':'새 메모'}</span>
+        <button class="dm-save-btn" id="dmSaveBtn" onclick="confirmDailyMemo()">✓ 확인</button>
       </div>
     </div>
 
@@ -2415,10 +2450,37 @@ function toggleNewBookingForm(){
   if(open)setTimeout(()=>document.getElementById('inName').focus(),100);
 }
 
+/* #5 모달 추가 필드 접기 */
+function toggleExtraFields(){
+  const ef=document.getElementById('extraFields');
+  const tog=document.getElementById('extraToggle');
+  if(!ef)return;
+  const show=!ef.classList.contains('show');
+  ef.classList.toggle('show',show);
+  if(tog)tog.textContent=show?'▲ 접기':'▼ 추가 정보 입력';
+}
+
+/* #10 검색창 확장/축소 */
+function expandSearch(){
+  const w=document.getElementById('searchWrap');
+  if(w){w.classList.add('expanded');setTimeout(()=>document.getElementById('globalSearch').focus(),100);}
+}
+function collapseSearch(){
+  const w=document.getElementById('searchWrap');
+  const inp=document.getElementById('globalSearch');
+  if(w&&inp&&!inp.value.trim())setTimeout(()=>w.classList.remove('expanded'),200);
+}
+
 function openModal(bldgId,room){modalCtx={bldgId,room};const bg=BUILDINGS.find(b=>b.id===bldgId);const isGH=bg&&bg.group==='gh';document.getElementById('modalTitle').textContent=bg?bg.name:bldgId;const tag=document.getElementById('modalRoomTag');tag.textContent=bldgId+' – '+room;tag.className='modal-room-tag '+(isGH?'tag-room-gh':'tag-room-ibs');document.getElementById('ltToggle').checked=false;document.getElementById('coWrap').style.opacity='1';document.getElementById('inCheckOut').disabled=false;var _ltB=document.getElementById('btnLTQuick');if(_ltB){_ltB.classList.remove('lt-active');document.getElementById('ltQuickLabel').textContent='체크아웃 없이 저장';}document.getElementById('inCheckIn').value=TODAYSTR;document.getElementById('inCheckOut').value='';document.getElementById('inName').value='';document.getElementById('inCompany').value='';document.getElementById('inPaymentSelect').value='';document.getElementById('inPayment').value='';document.getElementById('inRemark').value='';document.getElementById('inPhone').value='';document.getElementById('inEmail').value='';document.getElementById('inGuestCount').value='1';document.getElementById('inRoomRate').value='';document.getElementById('inCheckIn').classList.remove('error');document.getElementById('inCheckOut').classList.remove('error');document.getElementById('hintCI').classList.remove('show');document.getElementById('hintCO').classList.remove('show');document.getElementById('overlapWarn').classList.remove('show');document.getElementById('inRoom').innerHTML=buildRoomSelect(bldgId,room);
-// 새 예약 폼 초기화 (접힘)
+// 새 예약 폼 초기화 (빈 방이면 자동 열기)
 const nf=document.getElementById('newBookingForm');const na=document.getElementById('newBookingArrow');
-if(nf)nf.style.display='none';if(na)na.style.transform='';
+const _roomBookings=DATA.filter(b=>b.bldgId===bldgId&&b.room===room&&['active','longterm','upcoming'].includes(statusOf(b)));
+if(_roomBookings.length===0){
+  if(nf)nf.style.display='block';if(na)na.style.transform='rotate(90deg)';
+  setTimeout(()=>document.getElementById('inName').focus(),200);
+}else{
+  if(nf)nf.style.display='none';if(na)na.style.transform='';
+}
 renderModalBookings();document.getElementById('modalOverlay').classList.add('open');
   /* 포커스 트랩 활성화 */
   setTimeout(()=>{const m=document.querySelector('.modal');if(m)trapFocus(m);},100);}
@@ -3627,6 +3689,72 @@ function saveMemo(){
   const inp=document.getElementById('memoInput');
   if(inp)localStorage.setItem('ibs_memo',inp.value);
 }
+
+/* ── 날짜별 메모장 ── */
+let _memoViewDate=TODAYSTR;
+
+function getDailyMemo(ds){
+  try{
+    const all=JSON.parse(localStorage.getItem('ibs_daily_memos')||'{}');
+    return all[ds]||'';
+  }catch(e){return'';}
+}
+
+function saveDailyMemo(){
+  const inp=document.getElementById('dmInput');
+  if(!inp)return;
+  try{
+    const all=JSON.parse(localStorage.getItem('ibs_daily_memos')||'{}');
+    if(inp.value.trim()){
+      all[_memoViewDate]=inp.value;
+    }else{
+      delete all[_memoViewDate];
+    }
+    localStorage.setItem('ibs_daily_memos',JSON.stringify(all));
+  }catch(e){}
+}
+
+function dmChanged(){
+  const btn=document.getElementById('dmSaveBtn');
+  const st=document.getElementById('dmStatus');
+  if(btn){btn.classList.remove('saved');btn.textContent='✓ 확인';}
+  if(st)st.textContent='수정 중...';
+}
+
+function confirmDailyMemo(){
+  saveDailyMemo();
+  const btn=document.getElementById('dmSaveBtn');
+  const st=document.getElementById('dmStatus');
+  if(btn){btn.classList.add('saved');btn.textContent='✓ 저장됨';}
+  if(st){
+    const now=new Date();
+    st.textContent='저장 '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  }
+  showToast('📝 메모 저장 완료');
+  haptic&&haptic(5);
+  setTimeout(()=>{if(btn)btn.classList.remove('saved');},2000);
+}
+
+function shiftMemoDate(dir){
+  // 이동 전에 현재 메모 자동 저장
+  saveDailyMemo();
+  const d=pd(_memoViewDate);
+  if(!d)return;
+  const nd=addDays(d,dir);
+  _memoViewDate=d2s(nd);
+  const dows=['일','월','화','수','목','금','토'];
+  const isToday=_memoViewDate===TODAYSTR;
+  const label=isToday
+    ?`📝 오늘 (${nd.getMonth()+1}/${nd.getDate()}) 메모`
+    :`📝 ${nd.getMonth()+1}월 ${nd.getDate()}일 (${dows[nd.getDay()]}) 메모`;
+  document.getElementById('dmDateLabel').textContent=label;
+  const memo=getDailyMemo(_memoViewDate);
+  document.getElementById('dmInput').value=memo;
+  const st=document.getElementById('dmStatus');
+  const btn=document.getElementById('dmSaveBtn');
+  if(st)st.textContent=memo?'저장됨':'새 메모';
+  if(btn){btn.classList.remove('saved');btn.textContent='✓ 확인';}
+}
 // 메모가 있으면 자동 표시
 (function initMemo(){
   const memo=localStorage.getItem('ibs_memo');
@@ -4591,7 +4719,7 @@ function waCapMsg(){
   document.getElementById('headerDate').textContent=`${TODAY.getFullYear()}.${String(TODAY.getMonth()+1).padStart(2,'0')}.${String(TODAY.getDate()).padStart(2,'0')} (${days[TODAY.getDay()]})`;
   document.getElementById('propBtnGH').className='prop-btn'+(activeProp==='gh'?' active':'');
   document.getElementById('propBtnIBS').className='prop-btn'+(activeProp==='ibs'?' active-ibs':'');
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['overview','roommap','checkinout','calendar','stats','meals','guests'][i]===activeTab));
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['overview','meals','roommap','checkinout','calendar','guests','stats'][i]===activeTab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+activeTab));
 
   // 퀵 추가 체크인 기본값 = 오늘
@@ -4675,6 +4803,57 @@ async function autoLoadFromSheet(){
     console.error('autoLoadFromSheet:',e);
   }
 }
+
+/* ══════════════════════════════════════════════════
+   ★★★ #1 뒤로가기 처리 (모달/탭 히스토리) ★★★
+   ══════════════════════════════════════════════════ */
+const TAB_HISTORY=[];
+const _origGoTab=goTab;
+goTab=function(name){
+  if(activeTab!==name)TAB_HISTORY.push(activeTab);
+  if(TAB_HISTORY.length>20)TAB_HISTORY.shift();
+  history.pushState({tab:name},'',null);
+  _origGoTab(name);
+};
+window.addEventListener('popstate',function(e){
+  const mo=document.getElementById('modalOverlay');
+  if(mo&&mo.classList.contains('open')){closeModal();return;}
+  const cap=document.getElementById('capOverlay');
+  if(cap&&cap.classList.contains('open')){closeCap();return;}
+  const gp=document.getElementById('guestProfileOverlay');
+  if(gp&&gp.classList.contains('open')){closeGuestProfile();return;}
+  const cmd=document.getElementById('cmdOverlay');
+  if(cmd&&cmd.classList.contains('open')){closeCmdPalette();return;}
+  if(TAB_HISTORY.length>0){const prev=TAB_HISTORY.pop();_origGoTab(prev);}
+});
+
+/* ══════════════════════════════════════════════════
+   ★★★ #7 키보드 올라오면 FAB 숨기기 ★★★
+   ══════════════════════════════════════════════════ */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',function(){
+    const fab=document.querySelector('.fab-add');
+    if(!fab)return;
+    fab.style.display=(window.visualViewport.height<window.innerHeight*0.75)?'none':'';
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   ★★★ #8 당겨서 새로고침 ★★★
+   ══════════════════════════════════════════════════ */
+(function initPullRefresh(){
+  let _pY=0,_pD=0,_pOn=false;
+  document.addEventListener('touchstart',function(e){
+    if(window.scrollY===0&&!document.querySelector('.modal-overlay.open,.cap-overlay.open')){
+      _pY=e.touches[0].clientY;_pOn=true;_pD=0;
+    }
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){if(_pOn)_pD=e.touches[0].clientY-_pY;},{passive:true});
+  document.addEventListener('touchend',function(){
+    if(_pOn&&_pD>80){showToast('🔄 동기화 중...');if(typeof manualSync==='function')manualSync();}
+    _pOn=false;_pD=0;
+  },{passive:true});
+})();
 
 /* ══════════════════════════════════════════════════
    ★★★ 캡처 화면 확대/축소 ★★★
@@ -4771,7 +4950,7 @@ function downloadBlob(blob) {
    ★★★ 모바일 스와이프 탭 전환 ★★★
    ══════════════════════════════════════════════════ */
 (function initSwipe(){
-  const TAB_ORDER=['overview','roommap','checkinout','calendar','stats','meals','guests'];
+  const TAB_ORDER=['overview','meals','roommap','checkinout','calendar','guests','stats'];
   let _sx=0,_sy=0,_swiping=false;
   const mainEl=document.querySelector('.main');
   if(!mainEl)return;
