@@ -1,7 +1,9 @@
-const CACHE_NAME = 'ibs-dashboard-v17';
+const CACHE_NAME = 'ibs-dashboard-v18';
 const ASSETS = [
   './',
   './index.html',
+  './sw.js',
+  './manifest.json',
   'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap'
 ];
 
