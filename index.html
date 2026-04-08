@@ -58,6 +58,15 @@ body.dark .today-card-title{color:#93c5fd}
 .ab-warn{background:var(--yellow-light);border:1px solid #fde047}.ab-warn .ab-text,.ab-warn .ab-link{color:var(--yellow)}
 .ab-out{background:var(--red-light);border:1px solid #fca5a5}.ab-out .ab-text,.ab-out .ab-link{color:var(--red)}
 .ab-text{flex:1}.ab-link{font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline}
+/* file:// 실행 안내 배너 */
+.file-banner{background:var(--accent-light);border:1.5px solid var(--accent);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;font-size:13px}
+.file-banner .fb-text{flex:1;color:var(--accent);line-height:1.45}
+.file-banner .fb-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.file-banner code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,0,0,.04);padding:2px 6px;border-radius:6px;color:var(--text)}
+body.dark .file-banner code{background:rgba(255,255,255,.08);color:var(--text)}
+.fb-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.fb-btn:hover{box-shadow:var(--shadow)}
+.fb-close{border:none;background:transparent;color:var(--text3);font-size:18px;line-height:1;cursor:pointer;padding:2px 6px}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
 .kpi-icon{font-size:18px;margin-bottom:6px}.kpi-label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
@@ -1016,6 +1025,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
 <main class="main" id="main" role="main">
   <!-- 개요 탭 -->
   <div id="tab-overview" class="panel active" role="tabpanel" aria-labelledby="navtab-overview">
+    <div id="fileBannerMount"></div>
     <div id="todayCard" class="today-card"></div>
     <div class="property-switcher">
       <button class="prop-btn active" id="propBtnGH" type="button" data-action="setProp" data-prop="gh"><div class="prop-indicator"></div><div class="prop-btn-icon">🏢</div><div class="prop-btn-info"><div class="prop-btn-title">게스트하우스</div><div class="prop-btn-sub">Crest B·C·D동 + Park Place</div></div><span class="prop-btn-badge" id="propBadgeGH">-</span></button>
@@ -1297,6 +1307,12 @@ function initActionDelegation(){
       if(a==='openModal'){ const b=el.getAttribute('data-bldg'); const r=el.getAttribute('data-room'); if(typeof openModal==='function'&&b&&r) openModal(b,r); return; }
       if(a==='openModalStop'){ e.stopPropagation(); const b=el.getAttribute('data-bldg'); const r=el.getAttribute('data-room'); if(typeof openModal==='function'&&b&&r) openModal(b,r); return; }
       if(a==='chipClick'){ const b=el.getAttribute('data-bldg'); const r=el.getAttribute('data-room'); const st=el.getAttribute('data-status'); if(typeof chipClick==='function'&&b&&r&&st) chipClick(b,r,st); return; }
+      if(a==='copyFileBannerCmdPy'){ if(typeof copyFileBannerCmdPy==='function') copyFileBannerCmdPy(); return; }
+      if(a==='copyFileBannerCmdPyLauncher'){ if(typeof copyFileBannerCmdPyLauncher==='function') copyFileBannerCmdPyLauncher(); return; }
+      if(a==='copyFileBannerCmdNode'){ if(typeof copyFileBannerCmdNode==='function') copyFileBannerCmdNode(); return; }
+      if(a==='copyFileBannerUrl'){ if(typeof copyFileBannerUrl==='function') copyFileBannerUrl(); return; }
+      if(a==='dismissFileBanner'){ if(typeof dismissFileBanner==='function') dismissFileBanner(); return; }
+      if(a==='openFileBannerUrl'){ if(typeof openFileBannerUrl==='function') openFileBannerUrl(); return; }
       if(a==='calDayClick'){ const ds=el.getAttribute('data-day'); if(typeof calDayClick==='function'&&ds) calDayClick(ds); return; }
       if(a==='goTabSelectMealDay'){ const ds=el.getAttribute('data-day'); if(typeof goTab==='function') goTab('meals'); if(ds && typeof selectMealDay==='function') selectMealDay(ds); return; }
       if(a==='selectMealDay'){ const ds=el.getAttribute('data-day'); if(ds && typeof selectMealDay==='function') selectMealDay(ds); return; }
@@ -5209,9 +5225,12 @@ function waCapMsg(){
 
 (function init(){
   const days=['일','월','화','수','목','금','토'];
-  document.getElementById('headerDate').textContent=`${TODAY.getFullYear()}.${String(TODAY.getMonth()+1).padStart(2,'0')}.${String(TODAY.getDate()).padStart(2,'0')} (${days[TODAY.getDay()]})`;
-  document.getElementById('propBtnGH').className='prop-btn'+(activeProp==='gh'?' active':'');
-  document.getElementById('propBtnIBS').className='prop-btn'+(activeProp==='ibs'?' active-ibs':'');
+  const hd=document.getElementById('headerDate');
+  if(hd)hd.textContent=`${TODAY.getFullYear()}.${String(TODAY.getMonth()+1).padStart(2,'0')}.${String(TODAY.getDate()).padStart(2,'0')} (${days[TODAY.getDay()]})`;
+  const pgh=document.getElementById('propBtnGH');
+  if(pgh)pgh.className='prop-btn'+(activeProp==='gh'?' active':'');
+  const pibs=document.getElementById('propBtnIBS');
+  if(pibs)pibs.className='prop-btn'+(activeProp==='ibs'?' active-ibs':'');
   document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['overview','meals','roommap','checkinout','calendar','guests','stats'][i]===activeTab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+activeTab));
 
@@ -5245,7 +5264,8 @@ function waCapMsg(){
   const coBtn=document.getElementById(`co-f${listFilterCO}`);if(coBtn){document.querySelectorAll('[id^="co-f"]').forEach(e=>e.classList.remove('on'));coBtn.classList.add('on');}
 
   // 마지막 수정 시각 복원
-  const lastMod=localStorage.getItem('ibs_last_modified');
+  let lastMod='';
+  try{ lastMod=localStorage.getItem('ibs_last_modified')||''; }catch(e){ lastMod=''; }
   const lmEl=document.getElementById('lastModBadge');
   if(lastMod&&lmEl){
     const [date,time]=lastMod.split(' ');
@@ -5254,7 +5274,9 @@ function waCapMsg(){
   }
 
   if(typeof _updateFAB==='function')_updateFAB();
-  try{renderOverview();}catch(e){console.error('init:',e);showToast('⚠ 초기 로딩 중 오류가 발생했습니다');}
+  try{renderOverview();}catch(e){console.error('init:',e);showToast('⚠ 초기 로딩 오류: '+(e&&e.message?e.message:e));}
+  // 혹시 초기 렌더가 중간에 끊겨도 한 번 더 시도 (file:// / 브라우저별 초기화 타이밍 이슈 방어)
+  setTimeout(()=>{try{renderOverview();}catch(e){}},0);
   if(activeTab==='roommap'){try{renderBldgList();selectBldg(activeBldg);}catch(e){}}
   if(activeTab==='checkinout'){try{renderCheckinOut();}catch(e){}}
   if(activeTab==='guests'){try{renderGuests();}catch(e){}}
@@ -5267,6 +5289,114 @@ function waCapMsg(){
     autoLoadFromSheet();
   }
   // ★ 실시간 동기화는 liveSync 엔진이 30초 간격으로 처리 (스크립트 하단 참조)
+})();
+
+// 전역 오류를 토스트로 노출 (사용자 화면이 비는 이슈를 빠르게 감지/대응)
+window.addEventListener('error', (ev) => {
+  try{
+    const msg = (ev && ev.message) ? ev.message : '알 수 없는 오류';
+    showToast('⚠ 오류: ' + msg);
+  }catch(e){}
+});
+window.addEventListener('unhandledrejection', (ev) => {
+  try{
+    const r = ev && ev.reason;
+    const msg = (r && r.message) ? r.message : String(r||'알 수 없는 오류');
+    showToast('⚠ 오류: ' + msg);
+  }catch(e){}
+});
+
+// file:// 실행 안내 (PWA/동기화/캐시 이슈 예방)
+function dismissFileBanner(){
+  try{ localStorage.setItem('ibs_file_banner_dismissed','1'); }catch(e){}
+  const m=document.getElementById('fileBannerMount');
+  if(m) m.innerHTML='';
+}
+async function _copyText_(text){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok=document.execCommand('copy');
+    ta.remove();
+    return ok;
+  }catch(e){}
+  return false;
+}
+async function copyFileBannerCmdPy(){
+  const cmd='python -m http.server 5173';
+  const ok=await _copyText_(cmd);
+  showToast(ok?'✅ Python 명령이 복사되었습니다':'⚠ 복사 실패 — 아래 명령을 직접 복사해주세요');
+}
+async function copyFileBannerCmdPyLauncher(){
+  const cmd='py -m http.server 5173';
+  const ok=await _copyText_(cmd);
+  showToast(ok?'✅ py 명령이 복사되었습니다':'⚠ 복사 실패 — 아래 명령을 직접 복사해주세요');
+}
+async function copyFileBannerCmdNode(){
+  const cmd='npx http-server -p 5173';
+  const ok=await _copyText_(cmd);
+  showToast(ok?'✅ Node(npx) 명령이 복사되었습니다':'⚠ 복사 실패 — 아래 명령을 직접 복사해주세요');
+}
+async function copyFileBannerUrl(){
+  const url='http://localhost:5173/index.html';
+  const ok=await _copyText_(url);
+  showToast(ok?'✅ 주소가 복사되었습니다':'⚠ 복사 실패 — 아래 주소를 직접 복사해주세요');
+}
+function openFileBannerUrl(){
+  try{
+    window.open('http://localhost:5173/index.html','_blank');
+  }catch(e){
+    showToast('⚠ 새 탭 열기 실패 — 주소를 복사해 붙여넣어주세요');
+  }
+}
+(function initFileBanner(){
+  try{
+    if (location.protocol !== 'file:') return;
+    const dismissed = (()=>{try{return localStorage.getItem('ibs_file_banner_dismissed')==='1';}catch(e){return false;}})();
+    if (dismissed) return;
+    const mount = document.getElementById('fileBannerMount');
+    if (!mount) return;
+    const url = 'http://localhost:5173/index.html';
+    mount.innerHTML = `
+      <div class="file-banner" role="note" aria-label="로컬 서버 실행 안내">
+        <div style="font-size:16px;line-height:1">🧩</div>
+        <div class="fb-text">
+          <div style="font-weight:800;margin-bottom:2px">지금은 <b>파일(file://)</b>로 실행 중입니다</div>
+          <div>이 모드에서는 브라우저 정책 때문에 <b>동기화/캐시/PWA</b>가 불안정할 수 있어요. 아래처럼 <b>로컬 서버</b>로 실행하면 가장 안정적입니다.</div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <span style="color:var(--text2);font-size:12px;font-weight:700">PowerShell/터미널에서 아래 중 1개 실행</span>
+          </div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+            <code>py -m http.server 5173</code>
+            <code>python -m http.server 5173</code>
+            <code>npx http-server -p 5173</code>
+          </div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+            <span style="color:var(--text2);font-size:12px">실행 후</span>
+            <code>${url}</code>
+          </div>
+        </div>
+        <div class="fb-actions">
+          <button class="fb-btn" type="button" data-action="copyFileBannerCmdPyLauncher">py 복사</button>
+          <button class="fb-btn" type="button" data-action="copyFileBannerCmdPy">python 복사</button>
+          <button class="fb-btn" type="button" data-action="copyFileBannerCmdNode">npx 복사</button>
+          <button class="fb-btn" type="button" data-action="copyFileBannerUrl">주소 복사</button>
+          <button class="fb-btn" type="button" data-action="openFileBannerUrl">열기</button>
+        </div>
+        <button class="fb-close" type="button" aria-label="닫기" data-action="dismissFileBanner">×</button>
+      </div>
+    `;
+  }catch(e){}
 })();
 
 /* ★ 자동 시트 로딩 (새 기기 / 첫 접속 시) */
