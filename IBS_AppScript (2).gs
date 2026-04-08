@@ -48,10 +48,56 @@ function doGet(e) {
     if (e.parameter.action === 'loadBookings') {
       return loadBookingsForRestore();
     }
+    // 프론트(index.html)의 실시간 동기화 엔진이 사용하는 엔드포인트
+    if (e.parameter.action === 'loadAll') {
+      return loadAll();
+    }
     return jsonRes({ ok: false, error: 'unknown action' });
   } catch (err) {
     return jsonRes({ ok: false, error: err.message });
   }
+}
+
+// ================================================================
+// 2-1. loadAll: 예약 전체 + 마지막 수정 시각 (실시간 동기화용)
+// ================================================================
+function loadAll() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_BOOKINGS);
+  const lastModified = getLastModified_();
+  if (!sheet || sheet.getLastRow() < 2) {
+    return jsonRes({ ok: true, bookings: [], lastModified });
+  }
+
+  // bookings 컬럼 수는 프론트가 유연하게 처리하지만, 최소 11개는 맞춰줌
+  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 11).getValues();
+  const bookings = data.filter(r => r[0]).map(r => ({
+    id:        r[0], group:    r[1], bldgId:  r[2], room:    r[3],
+    check_in:  r[4], check_out:r[5], name:    r[6], company: r[7],
+    payment:   r[8], longterm: r[9] === 'Y',   remark:  r[10] || ''
+  }));
+
+  return jsonRes({ ok: true, bookings, lastModified });
+}
+
+function getLastModified_() {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    return props.getProperty('IBS_LAST_MODIFIED') || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function setLastModifiedNow_() {
+  try {
+    const now = new Date();
+    const ts =
+      fmtDate(now) + ' ' +
+      String(now.getHours()).padStart(2, '0') + ':' +
+      String(now.getMinutes()).padStart(2, '0');
+    PropertiesService.getScriptProperties().setProperty('IBS_LAST_MODIFIED', ts);
+  } catch (e) {}
 }
 
 function loadBookingsForRestore() {
@@ -329,6 +375,8 @@ function bulkSave(bookings) {
     .setBackground('#2563eb').setFontColor('#ffffff').setFontWeight('bold');
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1,headers.length);
+  // 실시간 동기화용 마지막 수정 시각 업데이트
+  setLastModifiedNow_();
   return jsonRes({ok:true,count:(bookings||[]).length});
 }
 
