@@ -153,3 +153,6 @@
 다음 세션에서는 먼저 `AGENTS.md`, `docs/CODEX-WORKFLOW.md`, `docs/ARCHITECTURE.md`, `docs/FRONTEND.md`, `docs/RELIABILITY.md`, `docs/code-map/current-system.md`, `docs/exec-plans/active/pilot-plan.md`, `docs/exec-plans/active/saas-release-roadmap.md`, `docs/continuity/current.md`를 읽고 시작한다.
 
 그 다음 가장 높은 우선순위 작업인 `docs/code-map/domain-model.md` 작성부터 진행한다.
+## 2026-04-09 엑셀 반영 로그 (룸맵)
+- 소스: `룸맵.루밍리스트 (Room Map).xlsx` 기준으로 `index.html`의 `DEFAULT_DATA`를 최신 예약 66건(gh 44, ibs 22)으로 갱신함.
+- 범위: 로그인/권한/결제/백엔드 교체 없이 데이터 정합성 업데이트만 수행함.
