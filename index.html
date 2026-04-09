@@ -1863,9 +1863,23 @@ window.addEventListener('pagehide',()=>autoSyncToSheet());
 function setSyncBadge(s){const el=document.getElementById('syncBadge');if(!el)return;if(s==='saving'){el.textContent='🔄 저장 중...';}else if(s==='saved'){el.textContent='✅ 저장됨';setTimeout(()=>{if(el.textContent==='✅ 저장됨')el.textContent='🟢 자동저장 켜짐';},2000);}else if(s==='error'){el.textContent='🔴 동기화 실패';el.style.color='var(--red)';setTimeout(()=>{el.textContent='🟢 자동저장 켜짐';el.style.color='';},5000);}else{el.textContent='🟢 자동저장 켜짐';}}
 
 /* ── API ── */
+async function fetchWithTimeout(url, options, timeoutMs){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try{
+    return await fetch(url, {...options, signal: controller.signal});
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function apiPost(body){
   try{
-    const r=await fetch(SCRIPT_URL,{method:'POST',redirect:'follow',body:JSON.stringify(body)});
+    const r=await fetchWithTimeout(
+      SCRIPT_URL,
+      {method:'POST',redirect:'follow',body:JSON.stringify(body)},
+      SYNC_REQUEST_TIMEOUT_MS
+    );
     if(!r.ok)throw new Error('서버 응답 오류: '+r.status);
     return await r.json();
   }catch(e){
@@ -1888,11 +1902,24 @@ async function saveAllToSheetVerified(opts){
 }
 async function fetchSheetSnapshot(){
   if(!SCRIPT_URL)throw new Error('SCRIPT_URL missing');
-  const r=await fetch(SCRIPT_URL+'?action=loadAll',{redirect:'follow'});
-  if(!r.ok)throw new Error('응답 오류: '+r.status);
-  const result=await r.json();
-  if(!result.ok)throw new Error(result.error||'시트 응답 오류');
-  return result;
+  let lastError = null;
+  for(let i=0;i<2;i++){
+    try{
+      const r=await fetchWithTimeout(
+        SCRIPT_URL+'?action=loadAll',
+        {redirect:'follow'},
+        SYNC_REQUEST_TIMEOUT_MS
+      );
+      if(!r.ok)throw new Error('응답 오류: '+r.status);
+      const result=await r.json();
+      if(!result.ok)throw new Error(result.error||'시트 응답 오류');
+      return result;
+    }catch(e){
+      lastError = e;
+      if(i===0) await new Promise(res=>setTimeout(res,700));
+    }
+  }
+  throw lastError || new Error('시트 응답 오류');
 }
 function setLoading(id,on){const b=document.getElementById(id);if(!b)return;if(on){b.classList.add('btn-loading');b.disabled=true;}else{b.classList.remove('btn-loading');b.disabled=false;}}
 async function syncSave(b){saveData();setSyncBadge('saved');if(SCRIPT_URL)apiPost({action:'save',booking:b});}
@@ -5667,10 +5694,12 @@ async function silentSheetCheck(){
    ══════════════════════════════════════════════════ */
 
 const SYNC_INTERVAL = 30000; // 30초마다 시트 체크
+const SYNC_REQUEST_TIMEOUT_MS = 15000;
 let _syncTimer = null;
 let _lastSyncHash = ''; // 데이터 해시로 변경 감지
 let _isSyncing = false;
 let _syncPaused = false;
+let _manualSyncInProgress = false;
 
 // 데이터 해시 생성 (변경 감지용)
 function dataHash(arr) {
@@ -5721,7 +5750,7 @@ function setLiveSyncBadge(status) {
 
 // 핵심: 시트에서 데이터 가져와서 변경사항 있으면 자동 반영
 async function liveSync() {
-  if (!SCRIPT_URL || _isSyncing || _syncPaused || !navigator.onLine) {
+  if (!SCRIPT_URL || _isSyncing || _syncPaused || _manualSyncInProgress || !navigator.onLine) {
     if (!navigator.onLine) setLiveSyncBadge('offline');
     return;
   }
@@ -5790,80 +5819,104 @@ async function liveSync() {
 
 // 수동 동기화 (배지 탭)
 async function manualSync() {
-  if (_isSyncing) { showToast('⏳ 동기화 진행 중...'); return; }
-  if (_isDefaultData) { showToast('⚠ 샘플 데이터 상태입니다. 먼저 ☁️ 시트에서 불러오기를 해주세요.'); return; }
-  showToast('🔄 시트와 동기화 중...');
+  if (_isSyncing || _manualSyncInProgress) { showToast('? ??? ?? ?...'); return; }
+  if (!navigator.onLine) { showToast('?? ???? ????? ?? ???? ??? ? ???.'); return; }
+  if (_isDefaultData) { showToast('? ?? ??? ?????. ?? ?? ???? ????? ????.'); return; }
+
+  _manualSyncInProgress = true;
+  const prevPaused = _syncPaused;
+  _syncPaused = true;
+  showToast('?? ??? ??? ?...');
   haptic && haptic(10);
+
   try {
     setLiveSyncBadge('syncing');
-    const saveResult = await saveAllToSheetVerified({silent:true});
-    if (!saveResult.ok) throw new Error(saveResult.error || '시트 저장 실패');
+    const saveResult = await saveAllToSheetVerified({ silent: true });
+    if (!saveResult.ok) throw new Error(saveResult.error || '?? ?? ??');
+
     const result = await fetchSheetSnapshot();
     if (Array.isArray(result.bookings)) {
       DATA = result.bookings;
       try {
         localStorage.setItem('ibs_data', JSON.stringify(DATA));
         localStorage.setItem('ibs_last_modified', result.lastModified || '');
-      } catch(e) {}
+      } catch (e) {}
       _localDataExists = true;
       _isDefaultData = false;
       if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
       refreshAll();
-      showToast('✅ 동기화 완료! ' + DATA.length + '건');
+      showToast('? ??? ??! ' + DATA.length + '?');
       setLiveSyncBadge('updated');
     } else {
-      showToast('✅ 동기화 완료 (변경사항 없음)');
+      showToast('? ??? ?? (???? ??)');
       setLiveSyncBadge('live');
     }
-  } catch(e) {
-    showToast('⚠️ 동기화 실패: ' + e.message);
+  } catch (e) {
+    showToast('? ?? ??? ??: ' + e.message);
     setLiveSyncBadge('offline');
+  } finally {
+    _manualSyncInProgress = false;
+    _syncPaused = prevPaused;
   }
 }
 
 async function runSyncTest() {
-  if (_isSyncing) { showToast('⏳ 동기화 진행 중입니다. 잠시 후 다시 시도해주세요.'); return; }
-  if (!SCRIPT_URL) { showToast('⚠ Apps Script URL이 비어 있습니다'); return; }
+  if (_isSyncing || _manualSyncInProgress) { showToast('? ??? ?? ????. ?? ? ?? ??????.'); return; }
+  if (!SCRIPT_URL) { showToast('? Apps Script URL? ?? ????'); return; }
+  if (!navigator.onLine) { showToast('?? ???? ????? ?? ???? ??? ? ???.'); return; }
   if (_isDefaultData) {
-    await showConfirm('⚠️','연동 테스트 안내','샘플 데이터 상태입니다.\n먼저 실제 시트 데이터를 불러온 뒤 테스트해주세요.','확인',false);
+    await showConfirm('??','?? ??? ??','?? ??? ?????.\n?? ?? ?? ???? ??? ? ???????.','??',false);
     return;
   }
+
+  _manualSyncInProgress = true;
+  const prevPaused = _syncPaused;
+  _syncPaused = true;
+
   const viewportOk = !!document.querySelector('meta[name="viewport"]');
   const manifestOk = !!document.querySelector('link[rel="manifest"]');
   const serviceWorkerOk = ('serviceWorker' in navigator);
-  const mobileHint = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '모바일 기기' : '데스크톱/브라우저';
-  showToast('🧪 연동 테스트 실행 중...');
+  const mobileHint = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '??? ??' : '????/????';
+  showToast('?? ?? ??? ?? ?...');
+
   try {
     setLiveSyncBadge('syncing');
-    const saveResult = await saveAllToSheetVerified({silent:true});
-    if (!saveResult.ok) throw new Error(saveResult.error || '시트 저장 실패');
+    const saveResult = await saveAllToSheetVerified({ silent: true });
+    if (!saveResult.ok) throw new Error(saveResult.error || '?? ?? ??');
+
     const remote = await fetchSheetSnapshot();
     const localCount = Array.isArray(DATA) ? DATA.length : 0;
     const remoteCount = Array.isArray(remote.bookings) ? remote.bookings.length : 0;
     const sameHash = dataHash(DATA) === dataHash(remote.bookings || []);
-    const lastModified = remote.lastModified || '없음';
+    const lastModified = remote.lastModified || '??';
     const passed = viewportOk && manifestOk && serviceWorkerOk && sameHash;
+
     const lines = [
-      passed ? 'PASS: 1회 테스트 통과' : 'FAIL: 추가 확인 필요',
-      '기기: ' + mobileHint,
-      '모바일 뷰포트: ' + (viewportOk ? '정상' : '누락'),
-      '앱 설치 manifest: ' + (manifestOk ? '정상' : '누락'),
-      'Service Worker: ' + (serviceWorkerOk ? '지원' : '미지원'),
-      '로컬 데이터: ' + localCount + '건',
-      '시트 데이터: ' + remoteCount + '건',
-      '데이터 일치: ' + (sameHash ? '일치' : '불일치'),
-      '시트 마지막 수정: ' + lastModified
+      passed ? 'PASS: 1? ??? ??' : 'FAIL: ?? ?? ??',
+      '??: ' + mobileHint,
+      '??? ???: ' + (viewportOk ? '??' : '??'),
+      '? ?? manifest: ' + (manifestOk ? '??' : '??'),
+      'Service Worker: ' + (serviceWorkerOk ? '??' : '???'),
+      '?? ???: ' + localCount + '?',
+      '?? ???: ' + remoteCount + '?',
+      '??? ??: ' + (sameHash ? '??' : '???'),
+      '?? ??? ??: ' + lastModified
     ];
+
     setLiveSyncBadge(passed ? 'updated' : 'conflict');
-    await showConfirm(passed ? '🧪' : '⚠️','연동 테스트 결과',lines.join('\n'),'확인',false);
-  } catch(e) {
+    await showConfirm(passed ? '??' : '??','?? ??? ??',lines.join('\n'),'??',false);
+  } catch (e) {
     setLiveSyncBadge('offline');
-    await showConfirm('⚠️','연동 테스트 실패','실패 이유: ' + e.message + '\n\n네트워크 또는 Apps Script 배포 상태를 확인해주세요.','확인',false);
+    await showConfirm('??','?? ??? ??','?? ??: ' + e.message + '\n\n???? ?? Apps Script ?? ??? ??????.','??',false);
+  } finally {
+    _manualSyncInProgress = false;
+    _syncPaused = prevPaused;
   }
 }
 
-// 동기화 타이머 시작
+// ??? ??? ??? ??
 function startLiveSync() {
+
   if (_syncTimer) clearInterval(_syncTimer);
   _lastSyncHash = dataHash(DATA);
   _syncTimer = setInterval(liveSync, SYNC_INTERVAL);
