@@ -1007,6 +1007,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
     <span class="sync-badge" id="syncBadge" data-action="manualSync" style="cursor:pointer" title="탭하여 수동 동기화">🟢 자동저장 켜짐</span>
     <span class="sync-badge" id="liveSyncBadge" style="font-size:11px;color:var(--green)" title="실시간 동기화 상태">🔄 실시간</span>
     <span class="last-modified-badge" id="lastModBadge" title="마지막 수정 시각" style="display:none"></span>
+    <button class="btn btn-ghost btn-sm" type="button" data-action="runSyncTest" aria-label="연동 테스트" title="모바일/데이터 연동 테스트">🧪 연동 테스트</button>
     <button class="btn btn-ghost btn-sm" type="button" data-action="generateDailyReport" aria-label="일일 보고서" title="일일 보고서 생성">📊 보고서</button>
     <span class="offline-badge" id="offlineBadge" style="display:none">⏳ 대기 0건</span>
     <button class="btn btn-ghost btn-sm" id="btnInstallApp" type="button" data-action="installPWA" style="display:none" title="앱으로 설치">📲 앱 설치</button>
@@ -1276,6 +1277,7 @@ function initActionDelegation(){
     try{
       if(a==='expandSearch'){ if(typeof expandSearch==='function') expandSearch(); return; }
       if(a==='manualSync'){ if(typeof manualSync==='function') manualSync(); return; }
+      if(a==='runSyncTest'){ if(typeof runSyncTest==='function') runSyncTest(); return; }
       if(a==='generateDailyReport'){ if(typeof generateDailyReport==='function') generateDailyReport(); return; }
       if(a==='installPWA'){ if(typeof installPWA==='function') installPWA(); return; }
       if(a==='toggleDark'){ if(typeof toggleDark==='function') toggleDark(); return; }
@@ -1871,6 +1873,26 @@ async function apiPost(body){
     showToast('⚠ 동기화 실패: '+e.message);
     return{ok:false,error:e.message};
   }
+}
+async function saveAllToSheetVerified(opts){
+  const options=opts||{};
+  if(!SCRIPT_URL)return{ok:false,error:'SCRIPT_URL missing'};
+  if(_isDefaultData)return{ok:false,error:'sample_data'};
+  const result=await apiPost({action:'bulkSave',bookings:DATA});
+  if(result.ok){
+    try{localStorage.setItem('ibs_last_modified',new Date().toISOString().slice(0,16).replace('T',' '));}catch(e){}
+    setSyncBadge('saved');
+    if(!options.silent)showToast('✅ 시트 저장 확인: '+(result.count||0)+'건');
+  }
+  return result;
+}
+async function fetchSheetSnapshot(){
+  if(!SCRIPT_URL)throw new Error('SCRIPT_URL missing');
+  const r=await fetch(SCRIPT_URL+'?action=loadAll',{redirect:'follow'});
+  if(!r.ok)throw new Error('응답 오류: '+r.status);
+  const result=await r.json();
+  if(!result.ok)throw new Error(result.error||'시트 응답 오류');
+  return result;
 }
 function setLoading(id,on){const b=document.getElementById(id);if(!b)return;if(on){b.classList.add('btn-loading');b.disabled=true;}else{b.classList.remove('btn-loading');b.disabled=false;}}
 async function syncSave(b){saveData();setSyncBadge('saved');if(SCRIPT_URL)apiPost({action:'save',booking:b});}
@@ -4752,7 +4774,8 @@ function cmdSearch(q){
   var el=document.getElementById('cmdResults');
   _cmdIdx=-1;
   if(!q.trim()){
-    el.innerHTML='<div class="cmd-item" data-action="cmdCloseAndOpenModalNew"><div class="cmd-item-icon">➕</div><div class="cmd-item-main"><div class="cmd-item-title">새 예약 추가</div></div></div>'
+    _cmdIdx=0;
+    el.innerHTML='<div class="cmd-item selected" data-action="cmdCloseAndOpenModalNew"><div class="cmd-item-icon">➕</div><div class="cmd-item-main"><div class="cmd-item-title">새 예약 추가</div></div></div>'
       +'<div class="cmd-item" data-action="cmdCloseAndGoTab" data-tab="calendar"><div class="cmd-item-icon">📅</div><div class="cmd-item-main"><div class="cmd-item-title">달력 보기</div></div></div>'
       +'<div class="cmd-item" data-action="cmdCloseAndGoTab" data-tab="meals"><div class="cmd-item-icon">🍱</div><div class="cmd-item-main"><div class="cmd-item-title">식수 관리</div></div></div>'
       +'<div class="cmd-item" data-action="cmdCloseAndGoTab" data-tab="stats"><div class="cmd-item-icon">📊</div><div class="cmd-item-main"><div class="cmd-item-title">통계</div></div></div>';
@@ -4763,6 +4786,7 @@ function cmdSearch(q){
     return(b.name||'').toLowerCase().indexOf(ql)>=0||(b.company||'').toLowerCase().indexOf(ql)>=0||(b.room||'').toLowerCase().indexOf(ql)>=0||(b.bldgId||'').toLowerCase().indexOf(ql)>=0||(b.remark||'').toLowerCase().indexOf(ql)>=0||(b.phone||'').toLowerCase().indexOf(ql)>=0;
   }).slice(0,10);
   if(!results.length){el.innerHTML='<div class="cmd-empty">🔍 "'+esc(q)+'" 검색 결과 없음</div>';return;}
+  _cmdIdx=0;
   var stL={active:'투숙중',longterm:'장기',upcoming:'예정',past:'퇴실',confirm:'확인필요',unknown:'?'};
   var stBg={active:'var(--accent-light)',longterm:'var(--green-light)',upcoming:'var(--orange-light)',past:'var(--surface2)',confirm:'var(--red-light)'};
   var stC={active:'var(--accent)',longterm:'var(--green)',upcoming:'var(--orange)',past:'var(--text3)',confirm:'var(--red)'};
@@ -5223,7 +5247,7 @@ function waCapMsg(){
   window.open(url,'_blank');
 }
 
-(function init(){
+(async function init(){
   const days=['일','월','화','수','목','금','토'];
   const hd=document.getElementById('headerDate');
   if(hd)hd.textContent=`${TODAY.getFullYear()}.${String(TODAY.getMonth()+1).padStart(2,'0')}.${String(TODAY.getDate()).padStart(2,'0')} (${days[TODAY.getDay()]})`;
@@ -5231,6 +5255,9 @@ function waCapMsg(){
   if(pgh)pgh.className='prop-btn'+(activeProp==='gh'?' active':'');
   const pibs=document.getElementById('propBtnIBS');
   if(pibs)pibs.className='prop-btn'+(activeProp==='ibs'?' active-ibs':'');
+  if(!_localDataExists&&SCRIPT_URL){
+    await autoLoadFromSheet({silent:true,skipRefresh:true});
+  }
   document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['overview','meals','roommap','checkinout','calendar','guests','stats'][i]===activeTab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+activeTab));
 
@@ -5400,10 +5427,13 @@ function openFileBannerUrl(){
 })();
 
 /* ★ 자동 시트 로딩 (새 기기 / 첫 접속 시) */
-async function autoLoadFromSheet(){
-  if(!SCRIPT_URL)return;
+async function autoLoadFromSheet(opts){
+  const options=opts||{};
+  const silent=!!options.silent;
+  const skipRefresh=!!options.skipRefresh;
+  if(!SCRIPT_URL)return false;
   setSyncBadge('saving');
-  showToast('☁️ 시트에서 데이터 불러오는 중...');
+  if(!silent)showToast('☁️ 시트에서 데이터 불러오는 중...');
   try{
     const r=await fetch(SCRIPT_URL+'?action=loadAll',{redirect:'follow'});
     if(!r.ok)throw new Error('응답 오류: '+r.status);
@@ -5413,17 +5443,20 @@ async function autoLoadFromSheet(){
       saveData();
       _isDefaultData=false;
       if(typeof invalidateStatusCache==='function')invalidateStatusCache();
-      refreshAll();
-      showToast('✅ 시트에서 '+DATA.length+'건 자동 불러옴');
+      if(!skipRefresh)refreshAll();
+      if(!silent)showToast('✅ 시트에서 '+DATA.length+'건 자동 불러옴');
       setSyncBadge('saved');
+      return true;
     }else{
-      showToast('ℹ️ 시트에 저장된 데이터가 없습니다. 새로 시작합니다.');
+      if(!silent)showToast('ℹ️ 시트에 저장된 데이터가 없습니다. 새로 시작합니다.');
       setSyncBadge('saved');
+      return false;
     }
   }catch(e){
-    showToast('⚠ 시트 연결 실패 — 오프라인 모드');
+    if(!silent)showToast('⚠ 시트 연결 실패 — 오프라인 모드');
     setSyncBadge('error');
     console.error('autoLoadFromSheet:',e);
+    return false;
   }
 }
 
@@ -5704,8 +5737,22 @@ async function liveSync() {
       
       if (remoteHash !== localHash && remoteHash !== _lastSyncHash) {
         // 시트 데이터가 다름 → 변경 감지!
+        const hasUsableLocal = !!(_localDataExists && !_isDefaultData && Array.isArray(DATA) && DATA.length > 0);
         const localMod = localStorage.getItem('ibs_last_modified') || '';
         const remoteMod = result.lastModified || '';
+
+        // 새 기기/모바일 첫 접속처럼 로컬 기준점이 없으면 시트 기준으로 복원
+        if (!hasUsableLocal || !localMod) {
+          DATA = result.bookings;
+          saveData();
+          _isDefaultData = false;
+          if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
+          refreshAll();
+          showToast('☁️ 시트 데이터가 이 기기에 복원되었습니다');
+          setLiveSyncBadge('updated');
+          _lastSyncHash = remoteHash;
+          return;
+        }
         
         // 시트가 더 최근이면 자동 반영 (다른 직원이 수정한 것)
         if (remoteMod && localMod && remoteMod > localMod) {
@@ -5744,35 +5791,75 @@ async function liveSync() {
 // 수동 동기화 (배지 탭)
 async function manualSync() {
   if (_isSyncing) { showToast('⏳ 동기화 진행 중...'); return; }
+  if (_isDefaultData) { showToast('⚠ 샘플 데이터 상태입니다. 먼저 ☁️ 시트에서 불러오기를 해주세요.'); return; }
   showToast('🔄 시트와 동기화 중...');
   haptic && haptic(10);
-  
-  // 먼저 내 데이터 시트에 올리기
-  autoSyncToSheet();
-  
-  // 잠시 후 시트에서 최신 가져오기
-  setTimeout(async () => {
-    try {
-      const r = await fetch(SCRIPT_URL + '?action=loadAll', { redirect: 'follow' });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const result = await r.json();
-      if (result.ok && Array.isArray(result.bookings) && result.bookings.length > 0) {
-        DATA = result.bookings;
-        saveData();
-        _isDefaultData = false;
-        if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
-        refreshAll();
-        showToast('✅ 동기화 완료! ' + DATA.length + '건');
-        setLiveSyncBadge('updated');
-      } else {
-        showToast('✅ 동기화 완료 (변경사항 없음)');
-        setLiveSyncBadge('live');
-      }
-    } catch(e) {
-      showToast('⚠️ 동기화 실패: ' + e.message);
-      setLiveSyncBadge('offline');
+  try {
+    setLiveSyncBadge('syncing');
+    const saveResult = await saveAllToSheetVerified({silent:true});
+    if (!saveResult.ok) throw new Error(saveResult.error || '시트 저장 실패');
+    const result = await fetchSheetSnapshot();
+    if (Array.isArray(result.bookings)) {
+      DATA = result.bookings;
+      try {
+        localStorage.setItem('ibs_data', JSON.stringify(DATA));
+        localStorage.setItem('ibs_last_modified', result.lastModified || '');
+      } catch(e) {}
+      _localDataExists = true;
+      _isDefaultData = false;
+      if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
+      refreshAll();
+      showToast('✅ 동기화 완료! ' + DATA.length + '건');
+      setLiveSyncBadge('updated');
+    } else {
+      showToast('✅ 동기화 완료 (변경사항 없음)');
+      setLiveSyncBadge('live');
     }
-  }, 1500);
+  } catch(e) {
+    showToast('⚠️ 동기화 실패: ' + e.message);
+    setLiveSyncBadge('offline');
+  }
+}
+
+async function runSyncTest() {
+  if (_isSyncing) { showToast('⏳ 동기화 진행 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+  if (!SCRIPT_URL) { showToast('⚠ Apps Script URL이 비어 있습니다'); return; }
+  if (_isDefaultData) {
+    await showConfirm('⚠️','연동 테스트 안내','샘플 데이터 상태입니다.\n먼저 실제 시트 데이터를 불러온 뒤 테스트해주세요.','확인',false);
+    return;
+  }
+  const viewportOk = !!document.querySelector('meta[name="viewport"]');
+  const manifestOk = !!document.querySelector('link[rel="manifest"]');
+  const serviceWorkerOk = ('serviceWorker' in navigator);
+  const mobileHint = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? '모바일 기기' : '데스크톱/브라우저';
+  showToast('🧪 연동 테스트 실행 중...');
+  try {
+    setLiveSyncBadge('syncing');
+    const saveResult = await saveAllToSheetVerified({silent:true});
+    if (!saveResult.ok) throw new Error(saveResult.error || '시트 저장 실패');
+    const remote = await fetchSheetSnapshot();
+    const localCount = Array.isArray(DATA) ? DATA.length : 0;
+    const remoteCount = Array.isArray(remote.bookings) ? remote.bookings.length : 0;
+    const sameHash = dataHash(DATA) === dataHash(remote.bookings || []);
+    const lastModified = remote.lastModified || '없음';
+    const passed = viewportOk && manifestOk && serviceWorkerOk && sameHash;
+    const lines = [
+      passed ? 'PASS: 1회 테스트 통과' : 'FAIL: 추가 확인 필요',
+      '기기: ' + mobileHint,
+      '모바일 뷰포트: ' + (viewportOk ? '정상' : '누락'),
+      '앱 설치 manifest: ' + (manifestOk ? '정상' : '누락'),
+      'Service Worker: ' + (serviceWorkerOk ? '지원' : '미지원'),
+      '로컬 데이터: ' + localCount + '건',
+      '시트 데이터: ' + remoteCount + '건',
+      '데이터 일치: ' + (sameHash ? '일치' : '불일치'),
+      '시트 마지막 수정: ' + lastModified
+    ];
+    setLiveSyncBadge(passed ? 'updated' : 'conflict');
+    await showConfirm(passed ? '🧪' : '⚠️','연동 테스트 결과',lines.join('\n'),'확인',false);
+  } catch(e) {
+    setLiveSyncBadge('offline');
+    await showConfirm('⚠️','연동 테스트 실패','실패 이유: ' + e.message + '\n\n네트워크 또는 Apps Script 배포 상태를 확인해주세요.','확인',false);
+  }
 }
 
 // 동기화 타이머 시작
@@ -5813,6 +5900,7 @@ window.addEventListener('offline', () => {
 // 초기 실행
 if (SCRIPT_URL) {
   startLiveSync();
+  liveSync();
 }
 
 /* ══════════════════════════════════════════════════
