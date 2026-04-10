@@ -1,0 +1,28 @@
+{
+  "name": "google-sheets-sync-backend",
+  "version": "1.0.0",
+  "description": "Node.js webhook receiver for syncing Google Sheets rows into PostgreSQL.",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/db/pool.js && node --check src/db/sheetSyncRepository.js && node --check src/middleware/verifyWebhookToken.js && node --check src/routes/healthRoutes.js && node --check src/routes/webhookRoutes.js && node --check src/services/sheetSyncService.js && node --check src/utils/logger.js"
+  },
+  "keywords": [
+    "google-sheets",
+    "webhook",
+    "express",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "pg": "^8.13.3"
+  }
+}
