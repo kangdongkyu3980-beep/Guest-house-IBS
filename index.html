@@ -29,6 +29,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .header-date{font-size:12px;color:var(--text2);background:var(--surface2);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
 .header-actions{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .sync-badge{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border)}
+.new-booking-alert-mount{position:sticky;top:56px;z-index:190;padding:8px 12px 0}
+.new-booking-alert{max-width:1400px;margin:0 auto;background:#fff7ed;border:1px solid #fdba74;border-radius:14px;box-shadow:var(--shadow-md);padding:12px 14px;display:flex;align-items:flex-start;gap:12px}
+.new-booking-alert-icon{font-size:20px;line-height:1;flex-shrink:0}
+.new-booking-alert-body{flex:1;min-width:0}
+.new-booking-alert-title{font-size:14px;font-weight:800;color:var(--orange);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.new-booking-alert-count{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(234,88,12,.12);border:1px solid rgba(234,88,12,.25);color:var(--orange)}
+.new-booking-alert-summary{font-size:12px;color:#9a3412;line-height:1.5;margin-top:5px;word-break:keep-all}
+.new-booking-alert-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.new-booking-alert-btn{border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.new-booking-alert-btn-primary{background:var(--orange);color:#fff}
+.new-booking-alert-btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.new-booking-alert-btn:hover{filter:brightness(.98)}
+.new-booking-alert-sub{font-size:11px;color:var(--text2);margin-top:4px}
 /* FAB 예약 버튼 */
 .fab-add{position:fixed;bottom:28px;right:24px;z-index:300;background:var(--accent);color:#fff;border:none;border-radius:50px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.4);font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;gap:7px;transition:all .2s}
 .fab-add:hover{background:#1d4ed8;transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,.5)}
@@ -431,6 +444,12 @@ tbody tr:last-child td{border-bottom:none}tbody tr:hover td{background:var(--sur
   .modal-extra-toggle{text-align:center;padding:8px;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;border-top:1px dashed var(--border);margin-top:8px}
   .modal-extra-toggle:hover{background:var(--accent-light)}
   .header-actions{margin-left:0;width:100%;padding-bottom:2px;gap:4px;flex-wrap:wrap}.header-actions .btn{font-size:10px;padding:4px 7px}.sync-badge{font-size:10px;padding:2px 7px}
+  .new-booking-alert-mount{top:58px;padding:6px 8px 0}
+  .new-booking-alert{padding:10px 11px;gap:9px;border-radius:12px}
+  .new-booking-alert-title{font-size:13px}
+  .new-booking-alert-summary{font-size:11px}
+  .new-booking-alert-actions{gap:6px}
+  .new-booking-alert-btn{flex:1;justify-content:center;text-align:center;padding:8px 10px}
   .header-actions .btn span.btn-label{display:none}
   .nav{padding:0 4px;overflow-x:auto;-webkit-overflow-scrolling:touch}.nav-tab{padding:8px 10px;font-size:11px;flex-shrink:0}.main{padding:10px 8px}
   .property-switcher{flex-direction:column}.prop-btn{border-right:none;border-bottom:1px solid var(--border)}.prop-btn:last-child{border-bottom:none}
@@ -1006,6 +1025,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
   <div class="header-actions">
     <span class="sync-badge" id="syncBadge" data-action="manualSync" style="cursor:pointer" title="탭하여 수동 동기화">🟢 자동저장 켜짐</span>
     <span class="sync-badge" id="liveSyncBadge" style="font-size:11px;color:var(--green)" title="실시간 동기화 상태">🔄 실시간</span>
+    <span class="sync-badge" id="newBookingAlertBadge" data-action="showNewBookingDetails" style="display:none;cursor:pointer;color:var(--orange);border-color:#fdba74;background:#fff7ed" title="미확인 새 예약 보기">새 예약 0건</span>
     <span class="last-modified-badge" id="lastModBadge" title="마지막 수정 시각" style="display:none"></span>
     <button class="btn btn-ghost btn-sm" type="button" data-action="runSyncTest" aria-label="연동 테스트" title="모바일/데이터 연동 테스트">🧪 연동 테스트</button>
     <button class="btn btn-ghost btn-sm" type="button" data-action="generateDailyReport" aria-label="일일 보고서" title="일일 보고서 생성">📊 보고서</button>
@@ -1014,6 +1034,7 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans
     <button class="btn btn-ghost btn-sm" id="btnDark" type="button" data-action="toggleDark" aria-label="다크모드 전환">🌙</button>
   </div>
 </header>
+<div id="newBookingAlertMount" class="new-booking-alert-mount"></div>
 <nav class="nav" role="tablist" aria-label="대시보드 탭 네비게이션">
   <button type="button" class="nav-tab active" id="navtab-overview" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview" tabindex="0">📊 개요</button>
   <button type="button" class="nav-tab" id="navtab-meals" data-tab="meals" role="tab" aria-selected="false" aria-controls="tab-meals" tabindex="-1">🍱 식사</button>
@@ -1406,6 +1427,8 @@ function initActionDelegation(){
       if(a==='trashRestore'){ const id=el.getAttribute('data-id'); if(typeof _trashRestore==='function'&&id) _trashRestore(id); return; }
       if(a==='trashDelete'){ const id=el.getAttribute('data-id'); if(typeof _trashDelete==='function'&&id) _trashDelete(id); return; }
       if(a==='toggleNewBookingForm'){ if(typeof toggleNewBookingForm==='function') toggleNewBookingForm(); return; }
+      if(a==='confirmNewBookings'){ if(typeof confirmNewBookings==='function') confirmNewBookings(); return; }
+      if(a==='showNewBookingDetails'){ if(typeof showNewBookingDetails==='function') showNewBookingDetails(); return; }
       if(a==='openDRP'){ const id=el.getAttribute('data-drp'); if(typeof openDRP==='function'&&id) openDRP(id,null,id); return; }
       if(a==='toggleExtraFields'){ if(typeof toggleExtraFields==='function') toggleExtraFields(); return; }
       if(a==='quickLongterm'){ if(typeof quickLongterm==='function') quickLongterm(); return; }
@@ -1638,6 +1661,8 @@ function validateBooking(b){
 
 const TODAYSTR=`${TODAY.getFullYear()}-${String(TODAY.getMonth()+1).padStart(2,'0')}-${String(TODAY.getDate()).padStart(2,'0')}`;
 
+/* ── 대상 예약 시트: 1R8PmFE2z7Davq-ss7SXr4tqsbMU9nyql ── */
+const TARGET_SPREADSHEET_ID='1R8PmFE2z7Davq-ss7SXr4tqsbMU9nyql';
 /* ── 보안: API URL (실 운영 시 환경변수 또는 서버 사이드에서 관리 권장) ── */
 const SCRIPT_URL=(()=>{try{return atob('aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4WE80Nk5DLWRmWUVUQkUzWndJY2ViREZ5LTJBbXFKaFVuWnhoMEd1ZHh1Sko2S19fVi0yWUVZc2tQVEpwSVlWY1o0dy9leGVj');}catch(e){return'';}})();
 
@@ -1756,6 +1781,8 @@ function saveData(){
   localStorage.setItem('ibs_last_modified',`${TODAYSTR} ${ts}`);
   const el=document.getElementById('lastModBadge');
   if(el){el.textContent=`수정 ${ts}`;el.style.display='';}
+  try{markCurrentBookingsAsSeen(DATA);}catch(e){}
+  try{renderNewBookingAlert();}catch(e){}
 }
 function genId(){return 'x'+Date.now()+Math.random().toString(36).slice(2,5);}
 let DATA=loadData();
@@ -5333,6 +5360,8 @@ function waCapMsg(){
   if(activeTab==='calendar'){try{renderCalendar();}catch(e){}}
   if(activeTab==='stats'){try{renderStats();}catch(e){}}
   if(activeTab==='meals'){try{renderMeals();}catch(e){}}
+  ensureNewBookingBaseline(DATA);
+  renderNewBookingAlert();
 
   // ★ 자동 시트 동기화: 로컬에 데이터가 없으면 시트에서 자동으로 불러오기 (핸드폰 대응)
   if(!_localDataExists && SCRIPT_URL){
@@ -5708,6 +5737,262 @@ function dataHash(arr) {
   return String(h);
 }
 
+const NEW_BOOKING_PENDING_KEY = 'unconfirmed_new_bookings';
+const NEW_BOOKING_META_KEY = 'ibs_unconfirmed_new_booking_meta';
+const NEW_BOOKING_BASELINE_KEY = 'ibs_new_booking_baseline_ids';
+const NEW_BOOKING_BASELINE_READY_KEY = 'ibs_new_booking_baseline_ready';
+
+// 새 예약 감지용 안정 ID
+// 1순위는 기존 id 필드
+// 2순위는 정말 id가 없을 때만 핵심 필드 조합으로 만든 안전한 폴백 키
+function getBookingStableId(booking) {
+  if (!booking || typeof booking !== 'object') return '';
+  const rawId = typeof booking.id === 'string' ? booking.id.trim() : '';
+  if (rawId) return rawId;
+
+  const parts = [
+    booking.group,
+    booking.bldgId,
+    booking.room,
+    booking.check_in,
+    booking.check_out,
+    booking.name,
+    booking.company
+  ].map(v => String(v || '').trim());
+
+  const hasEnoughFields = parts[0] && parts[1] && parts[2] && (parts[3] || parts[5]);
+  if (!hasEnoughFields) return '';
+  return 'fallback|' + parts.join('|').toLowerCase();
+}
+
+// 빈 줄, 깨진 줄, 식별 불가 줄은 감지 대상에서 제외
+function isMeaningfulBookingRow(booking) {
+  if (!booking || typeof booking !== 'object') return false;
+  if (!getBookingStableId(booking)) return false;
+  return [booking.name, booking.room, booking.check_in, booking.company, booking.bldgId]
+    .some(v => String(v || '').trim());
+}
+
+function buildBookingLookup(bookings) {
+  const map = new Map();
+  (Array.isArray(bookings) ? bookings : []).forEach(booking => {
+    if (!isMeaningfulBookingRow(booking)) return;
+    const stableId = getBookingStableId(booking);
+    if (!stableId || map.has(stableId)) return;
+    map.set(stableId, booking);
+  });
+  return map;
+}
+
+function loadUnconfirmedNewBookings() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NEW_BOOKING_PENDING_KEY) || '[]');
+    return Array.isArray(raw) ? [...new Set(raw.filter(Boolean))] : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveUnconfirmedNewBookings(ids) {
+  const cleanIds = [...new Set((Array.isArray(ids) ? ids : []).filter(Boolean))];
+  safeSave(NEW_BOOKING_PENDING_KEY, cleanIds);
+}
+
+function loadUnconfirmedNewBookingMeta() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NEW_BOOKING_META_KEY) || '{}');
+    return raw && typeof raw === 'object' ? raw : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveUnconfirmedNewBookingMeta(meta) {
+  safeSave(NEW_BOOKING_META_KEY, meta && typeof meta === 'object' ? meta : {});
+}
+
+function loadNewBookingBaselineIds() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NEW_BOOKING_BASELINE_KEY) || '[]');
+    return Array.isArray(raw) ? [...new Set(raw.filter(Boolean))] : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveNewBookingBaselineIds(ids) {
+  const cleanIds = [...new Set((Array.isArray(ids) ? ids : []).filter(Boolean))];
+  safeSave(NEW_BOOKING_BASELINE_KEY, cleanIds);
+  try { localStorage.setItem(NEW_BOOKING_BASELINE_READY_KEY, '1'); } catch (e) {}
+}
+
+function hasNewBookingBaseline() {
+  try {
+    return localStorage.getItem(NEW_BOOKING_BASELINE_READY_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
+function ensureNewBookingBaseline(bookings) {
+  if (hasNewBookingBaseline()) return true;
+  saveNewBookingBaselineIds([...buildBookingLookup(bookings).keys()]);
+  return false;
+}
+
+function markCurrentBookingsAsSeen(bookings) {
+  saveNewBookingBaselineIds([...buildBookingLookup(bookings).keys()]);
+}
+
+function detectNewBookings(remoteBookings) {
+  const remoteMap = buildBookingLookup(remoteBookings);
+  if (!remoteMap.size) return [];
+
+  // 첫 기준선이 없으면 이번 스냅샷을 기준선으로만 저장하고 전체를 새 예약으로 보지 않음
+  if (!hasNewBookingBaseline()) {
+    const baselineSource = Array.isArray(DATA) && DATA.length ? DATA : remoteBookings;
+    markCurrentBookingsAsSeen(baselineSource);
+    return [];
+  }
+
+  const localMap = buildBookingLookup(DATA);
+  const localIds = new Set(localMap.keys());
+  const pendingIds = new Set(loadUnconfirmedNewBookings());
+  const newBookings = [];
+
+  remoteMap.forEach((booking, stableId) => {
+    if (!localIds.has(stableId) && !pendingIds.has(stableId)) {
+      newBookings.push(booking);
+    }
+  });
+
+  return newBookings;
+}
+
+function mergeUnconfirmedNewBookings(newBookings) {
+  if (!Array.isArray(newBookings) || !newBookings.length) return 0;
+
+  const pendingIds = new Set(loadUnconfirmedNewBookings());
+  const meta = loadUnconfirmedNewBookingMeta();
+  let addedCount = 0;
+
+  newBookings.forEach(booking => {
+    const stableId = getBookingStableId(booking);
+    if (!stableId || pendingIds.has(stableId)) return;
+    pendingIds.add(stableId);
+    meta[stableId] = {
+      id: stableId,
+      name: String(booking.name || '').trim(),
+      room: String(booking.room || '').trim(),
+      bldgId: String(booking.bldgId || '').trim(),
+      company: String(booking.company || '').trim(),
+      check_in: String(booking.check_in || '').trim(),
+      seenAt: new Date().toISOString()
+    };
+    addedCount += 1;
+  });
+
+  saveUnconfirmedNewBookings([...pendingIds]);
+  saveUnconfirmedNewBookingMeta(meta);
+  return addedCount;
+}
+
+function formatNewBookingSummaryText(booking, meta) {
+  const source = booking || meta || {};
+  const name = String(source.name || '\uC774\uB984 \uBBF8\uC0C1').trim() || '\uC774\uB984 \uBBF8\uC0C1';
+  const room = [source.bldgId, source.room].filter(Boolean).join('-') || '\uB8F8 \uBBF8\uC0C1';
+  const company = String(source.company || '').trim();
+  const checkIn = String(source.check_in || '').trim();
+  const checkInLabel = checkIn ? (checkIn.slice(5).replace('-', '/') + ' \uC785\uC2E4') : '\uC785\uC2E4\uC77C \uBBF8\uC0C1';
+  return [name, room, company, checkInLabel].filter(Boolean).join(' \u00B7 ');
+}
+
+function getPendingNewBookingItems() {
+  const pendingIds = loadUnconfirmedNewBookings();
+  const pendingMeta = loadUnconfirmedNewBookingMeta();
+  const currentMap = buildBookingLookup(DATA);
+
+  return pendingIds.map(id => {
+    const booking = currentMap.get(id) || null;
+    const meta = pendingMeta[id] || { id };
+    return {
+      id,
+      booking,
+      meta,
+      seenAt: meta.seenAt || '',
+      summary: formatNewBookingSummaryText(booking, meta)
+    };
+  }).sort((a, b) => String(b.seenAt || '').localeCompare(String(a.seenAt || '')));
+}
+
+function renderNewBookingAlert() {
+  const mount = document.getElementById('newBookingAlertMount');
+  const badge = document.getElementById('newBookingAlertBadge');
+  if (!mount || !badge) return;
+
+  const items = getPendingNewBookingItems();
+  const count = items.length;
+  const badgeBaseText = '\uC0C8 \uC608\uC57D';
+
+  if (!count) {
+    mount.innerHTML = '';
+    badge.style.display = 'none';
+    badge.textContent = `${badgeBaseText} 0\uAC74`;
+    return;
+  }
+
+  const summaryText = items.slice(0, 3).map(item => item.summary).join(' / ');
+  const moreCount = Math.max(0, count - 3);
+
+  badge.style.display = '';
+  badge.textContent = `${badgeBaseText} ${count}\uAC74`;
+
+  mount.innerHTML = `
+    <div class="new-booking-alert" role="alert" aria-live="assertive">
+      <div class="new-booking-alert-icon">🚨</div>
+      <div class="new-booking-alert-body">
+        <div class="new-booking-alert-title">
+          <span>\uBBF8\uD655\uC778 \uC0C8 \uC608\uC57D\uC774 \uC788\uC2B5\uB2C8\uB2E4</span>
+          <span class="new-booking-alert-count">${count}\uAC74</span>
+        </div>
+        <div class="new-booking-alert-summary">
+          ${esc(summaryText)}${moreCount > 0 ? ` \uC678 ${moreCount}\uAC74` : ''}
+        </div>
+        <div class="new-booking-alert-sub">\uC2DC\uD2B8\uC5D0\uC11C \uC0C8\uB85C \uB4E4\uC5B4\uC628 \uC608\uC57D\uC785\uB2C8\uB2E4. \uD655\uC778 \uC644\uB8CC\uB97C \uB204\uB974\uAE30 \uC804\uAE4C\uC9C0 \uACC4\uC18D \uD45C\uC2DC\uB429\uB2C8\uB2E4.</div>
+        <div class="new-booking-alert-actions">
+          <button type="button" class="new-booking-alert-btn new-booking-alert-btn-primary" data-action="confirmNewBookings">\uD655\uC778 \uC644\uB8CC</button>
+          <button type="button" class="new-booking-alert-btn new-booking-alert-btn-secondary" data-action="showNewBookingDetails">\uC790\uC138\uD788 \uBCF4\uAE30</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function confirmNewBookings(ids) {
+  const targetIds = Array.isArray(ids) && ids.length ? ids : loadUnconfirmedNewBookings();
+  if (!targetIds.length) {
+    renderNewBookingAlert();
+    return;
+  }
+
+  const targetSet = new Set(targetIds);
+  const nextPending = loadUnconfirmedNewBookings().filter(id => !targetSet.has(id));
+  const meta = loadUnconfirmedNewBookingMeta();
+  targetIds.forEach(id => { delete meta[id]; });
+
+  saveUnconfirmedNewBookings(nextPending);
+  saveUnconfirmedNewBookingMeta(meta);
+  renderNewBookingAlert();
+  showToast('\u2705 \uC0C8 \uC608\uC57D \uD655\uC778 \uC644\uB8CC');
+}
+
+function showNewBookingDetails() {
+  if (typeof goTab === 'function') goTab('guests');
+  const input = document.getElementById('guestSearch');
+  if (input) input.focus();
+  showToast('\uD83D\uDCCB \uAC8C\uC2A4\uD2B8 \uBAA9\uB85D\uC5D0\uC11C \uC0C8 \uC608\uC57D\uC744 \uD655\uC778\uD558\uC138\uC694');
+}
+
 // 실시간 동기화 배지 업데이트
 function setLiveSyncBadge(status) {
   const el = document.getElementById('liveSyncBadge');
@@ -5765,6 +6050,8 @@ async function liveSync() {
         const hasUsableLocal = !!(_localDataExists && !_isDefaultData && Array.isArray(DATA) && DATA.length > 0);
         const localMod = localStorage.getItem('ibs_last_modified') || '';
         const remoteMod = result.lastModified || '';
+        const detectedNewBookings = detectNewBookings(result.bookings);
+        let appliedRemote = false;
 
         // 새 기기/모바일 첫 접속처럼 로컬 기준점이 없으면 시트 기준으로 복원
         if (!hasUsableLocal || !localMod) {
@@ -5772,7 +6059,9 @@ async function liveSync() {
           saveData();
           _isDefaultData = false;
           if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
+          appliedRemote = true;
           refreshAll();
+          renderNewBookingAlert();
           showToast('☁️ 시트 데이터가 이 기기에 복원되었습니다');
           setLiveSyncBadge('updated');
           _lastSyncHash = remoteHash;
@@ -5785,7 +6074,9 @@ async function liveSync() {
           saveData();
           _isDefaultData = false;
           if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
+          appliedRemote = true;
           refreshAll();
+          renderNewBookingAlert();
           showToast('🔄 다른 직원이 업데이트한 데이터가 반영되었습니다');
           setLiveSyncBadge('updated');
           haptic && haptic(10);
@@ -5798,11 +6089,21 @@ async function liveSync() {
           setLiveSyncBadge('conflict');
           showToast('⚠️ 시트와 로컬 데이터가 다릅니다. 동기화 배지를 눌러 수동 동기화하세요.');
         }
+
+        if (appliedRemote && detectedNewBookings.length > 0) {
+          const addedCount = mergeUnconfirmedNewBookings(detectedNewBookings);
+          if (addedCount > 0) {
+            renderNewBookingAlert();
+            showToast(`🚨 새 예약 ${addedCount}건이 들어왔습니다`);
+          }
+        }
         _lastSyncHash = remoteHash;
       } else {
+        renderNewBookingAlert();
         setLiveSyncBadge('live');
       }
     } else {
+      renderNewBookingAlert();
       setLiveSyncBadge('live');
     }
   } catch(e) {
@@ -5839,8 +6140,10 @@ async function manualSync() {
       } catch (e) {}
       _localDataExists = true;
       _isDefaultData = false;
+      markCurrentBookingsAsSeen(DATA);
       if (typeof invalidateStatusCache === 'function') invalidateStatusCache();
       refreshAll();
+      renderNewBookingAlert();
       showToast('? ??? ??! ' + DATA.length + '?');
       setLiveSyncBadge('updated');
     } else {
